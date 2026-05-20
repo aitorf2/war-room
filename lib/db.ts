@@ -553,6 +553,59 @@ export function migrate(d: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_memory_cold_channel ON memory_cold(channel_id, importance DESC);
   `);
 
+  // Session memory system (Ideas 55, 38, 24, 163, 189, 113)
+  d.exec(`
+    CREATE TABLE IF NOT EXISTS session_testaments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      session_id INTEGER,
+      commitments_json TEXT NOT NULL DEFAULT '[]',
+      decisions_json TEXT NOT NULL DEFAULT '[]',
+      next_steps_json TEXT NOT NULL DEFAULT '[]',
+      open_questions_json TEXT NOT NULL DEFAULT '[]',
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_testaments_channel ON session_testaments(channel_id, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS channel_agreements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      is_immutable INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      created_by TEXT NOT NULL DEFAULT 'system'
+    );
+    CREATE INDEX IF NOT EXISTS idx_agreements_channel ON channel_agreements(channel_id, is_immutable DESC, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS work_frontier (
+      channel_id TEXT PRIMARY KEY,
+      frontier_json TEXT NOT NULL,
+      last_commit_sha TEXT,
+      last_file_touched TEXT,
+      deduced_at INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS friction_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      description TEXT NOT NULL,
+      frequency INTEGER NOT NULL DEFAULT 1,
+      last_seen_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_friction_channel ON friction_log(channel_id, frequency DESC);
+
+    CREATE TABLE IF NOT EXISTS memory_cold (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      tags_json TEXT NOT NULL DEFAULT '[]',
+      importance INTEGER NOT NULL DEFAULT 5,
+      created_at INTEGER NOT NULL,
+      last_accessed_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_memory_cold_channel ON memory_cold(channel_id, importance DESC, last_accessed_at DESC);
+  `);
+
   migrateClaudeSessionsAdapterId(d);
   migrateAddColumn(d, "chat_messages", "agent_id", "TEXT");
   migrateAddServerId(d, "user_channels");
