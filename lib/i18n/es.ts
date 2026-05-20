@@ -321,4 +321,108 @@ export const t = {
     pinMessage: "Fijar mensaje",
     agentIsUser: "tú",
   },
+  // ── Carril lateral (servidor) ──
+  rail: {
+    syncStatus: "Estado de sincronización",
+    clearImage: "Borrar imagen",
+
+    createServer: {
+      title: "Crear servidor",
+      subtitle: "Los servidores agrupan tus canales y categorías. Personal o compartido.",
+      serverName: "Nombre del servidor",
+      serverNamePlaceholder: "Nombre del espacio",
+      icon: "Icono (1-2 caracteres o emoji)",
+      iconPlaceholder: "auto",
+      color: "Color",
+      cancel: "Cancelar",
+      create: "Crear",
+    },
+
+    editServer: {
+      title: "Editar servidor",
+      subtitle: "Cambia el nombre, el icono o el color del envoltorio.",
+      warRoomLocked: "Este es el War Room oficial. El logo y el envoltorio violeta están bloqueados para mantener consistencia entre instalaciones. Puedes renombrarlo si quieres hacer un fork.",
+      serverName: "Nombre del servidor",
+      serverNamePlaceholder: "Nombre del espacio",
+      workspaceImage: "Imagen del espacio",
+      workspaceImagePlaceholder: "https://... o usa Subir",
+      workspaceImageHint: "Pega una URL o sube desde tu ordenador. Si está en blanco se usa la inicial del nombre.",
+      letterGlyph: "Inicial (si no hay imagen)",
+      letterGlyphHint: "Bloqueado al logo de War Room.",
+      letterGlyphPlaceholder: "auto",
+      colorLocked: "Bloqueado al violeta de la marca.",
+      color: "Color",
+      cancel: "Cancelar",
+      save: "Guardar",
+      serverIconTitle: (name: string) => `${name} · clic derecho para editar`,
+    },
+  },
+
+  // ── Menú contextual de canal ──
+  channelMenu: {
+    editChannel: "Editar canal…",
+    makePublic: "Hacer público",
+    makePrivate: "Hacer privado",
+    copyChannelLink: "Copiar enlace al canal",
+    deleteChannel: (name: string) => `Eliminar #${name}`,
+    deleteConfirm: (name: string) => `¿Eliminar #${name}?`,
+  },
+
+  // ── Paleta de comandos ──
+  commandPalette: {
+    searchPlaceholder: "Buscar canales, servidores, acciones…",
+    loading: "Cargando…",
+    noMatches: "Sin resultados.",
+    navigate: "Navegar",
+    select: "Seleccionar",
+    openClose: "Abrir / cerrar",
+
+    groups: {
+      channels: "Canales",
+      servers: "Servidores",
+      actions: "Acciones",
+    },
+
+    switchServer: "Cambiar servidor",
+    goHome: "Ir al inicio de War Room",
+    hintNavigate: "Navegar",
+    openActivity: "Abrir actividad del sistema",
+    hintSystemChannel: "Canal de sistema",
+    openServices: "Abrir estado de servicios",
+    openApprovals: "Abrir cola de aprobaciones",
+  },
+
+  // ── Canal de inicio ──
+  home: {
+    title: "Bienvenido a War Room",
+    subtitle: "Cabina local · localhost · sin costes",
+    vpsLabel: "VPS",
+    vpsServices: "servicios activos",
+    localLabel: "Local",
+    localDaemons: "daemons",
+    envLabel: "Env",
+    envKeys: "claves cargadas",
+    sessionsLabel: "Sesiones",
+    sessionsTracked: "rastreadas",
+    recentActivity: "Actividad reciente",
+    recentActivityCount: (n: number) => `${n} ${n === 1 ? "evento" : "eventos"}`,
+    activeSessions: "Sesiones activas",
+    activeSessionsCount: (n: number) => `${n} rastreadas`,
+    noActivity: "Sin actividad aún.",
+    noSessions: "Sin sesiones. Elige un canal y envía un mensaje.",
+  },
+
+  // ── Boardroom chat ──
+  boardroomChat: {
+    header: "Chat de sala",
+    headerHint: "menciona un agente para hablar",
+    noAgents: "sin agentes configurados",
+    mentionHint: (handle: string) => `Menciona un agente para hablar, p. ej. @${handle}. Escribe @ para ver los disponibles.`,
+    agentNotReady: (name: string, reason: string) => `${name} no está listo: ${reason}.`,
+    agentNotReadyCli: "ruta del binario no configurada en Ajustes → Agente",
+    agentNotReadyApi: "clave API no configurada en Ajustes → Agente",
+    agentPathPending: (name: string) => `Ruta del espacio de ${name} aún no disponible, inténtalo en un momento.`,
+    agentNotConfigured: (name: string) => `${name} no configurado`,
+    messagePlaceholder: "Menciona a @alguien…",
+  },
 } as const;

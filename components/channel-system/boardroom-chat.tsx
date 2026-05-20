@@ -5,6 +5,7 @@ import { AtSign, Send, Sparkles } from "lucide-react";
 import { Markdown } from "@/components/markdown";
 import { localMember, type TeamMember } from "@/lib/team";
 import { useIdentityVersion } from "@/lib/use-identity-version";
+import { t } from "@/lib/i18n/es";
 
 type AgentId = string;
 
@@ -315,7 +316,7 @@ export function BoardroomChat() {
         {
           kind: "system",
           id: `s-${Date.now()}-help`,
-          text: "Mention an agent to talk, e.g. @claude or @openai. Type @ to see who's available.",
+          text: t.boardroomChat.mentionHint(firstHandle),
           ts: Date.now(),
         },
       ]);
@@ -328,14 +329,14 @@ export function BoardroomChat() {
       if (!meta.online) {
         const reason =
           meta.kind === "cli"
-            ? "binary path not set under Settings → Agent"
-            : "API key not set under Settings → Agent";
+            ? t.boardroomChat.agentNotReadyCli
+            : t.boardroomChat.agentNotReadyApi;
         setItems((cur) => [
           ...cur,
           {
             kind: "system",
             id: `s-${Date.now()}-${agentId}`,
-            text: `${meta.name} isn't ready, ${reason}.`,
+            text: t.boardroomChat.agentNotReady(meta.name, reason),
             ts: Date.now(),
           },
         ]);
@@ -347,7 +348,7 @@ export function BoardroomChat() {
           {
             kind: "system",
             id: `s-${Date.now()}-path`,
-            text: `${meta.name} workspace path not resolved yet, try again in a moment.`,
+            text: t.boardroomChat.agentPathPending(meta.name),
             ts: Date.now(),
           },
         ]);
@@ -384,23 +385,23 @@ export function BoardroomChat() {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <div className="px-4 py-2 flex items-center gap-2 text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-900/60">
-        <AtSign className="w-3 h-3" />
-        Boardroom chat
-        <span className="text-neutral-700">·</span>
+        <AtSign className="w-3 h-3" aria-hidden />
+        {t.boardroomChat.header}
+        <span className="text-neutral-700" aria-hidden>·</span>
         <span className="text-neutral-600 normal-case tracking-normal">
-          mention an agent to talk
+          {t.boardroomChat.headerHint}
         </span>
         <div className="ml-auto flex items-center gap-2 flex-wrap justify-end">
           {agents.length === 0 ? (
             <span className="text-[10px] normal-case tracking-normal text-neutral-600">
-              no agents configured
+              {t.boardroomChat.noAgents}
             </span>
           ) : (
             agents.map((a) => (
               <span
                 key={a.id}
                 className="flex items-center gap-1 text-[10px] normal-case tracking-normal"
-                title={a.online ? `${a.name} · @${a.handle}` : `${a.name} not configured`}
+                title={a.online ? `${a.name} · @${a.handle}` : t.boardroomChat.agentNotConfigured(a.name)}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${a.online ? COLOR[a.color].dot : "bg-neutral-700"}`} />
                 <span className={a.online ? COLOR[a.color].text : "text-neutral-600"}>@{a.handle}</span>
@@ -413,8 +414,7 @@ export function BoardroomChat() {
       <div ref={scrollRef} className="flex-1 min-h-[12rem] overflow-y-auto px-4 py-3 flex flex-col gap-2">
         {items.length === 0 ? (
           <div className="text-xs text-neutral-600 text-center py-4">
-            Empty. Try{" "}
-            <code className="text-neutral-400">@{firstHandle} what&apos;s on the docket today?</code>
+            {t.boardroomChat.mentionHint(firstHandle)}
           </div>
         ) : (
           items.map((it) => <ChatRow key={it.id} item={it} agents={agents} />)
@@ -425,7 +425,7 @@ export function BoardroomChat() {
         {mentionOpen && filteredAgents.length > 0 && (
           <div className="absolute bottom-full left-4 mb-2 z-20 bg-neutral-900 border border-neutral-800 rounded-lg shadow-2xl overflow-hidden min-w-[260px]">
             <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-800">
-              Mention an agent
+              {t.boardroomChat.header}
             </div>
             {filteredAgents.map((a, i) => (
               <button
@@ -438,7 +438,7 @@ export function BoardroomChat() {
                 <span className={`w-2 h-2 rounded-full ${a.online ? COLOR[a.color].dot : "bg-neutral-700"}`} />
                 <span className={COLOR[a.color].text}>@{a.handle}</span>
                 <span className="text-neutral-500 text-xs ml-auto">
-                  {a.online ? a.name : "not configured"}
+                  {a.online ? a.name : t.boardroomChat.noAgents}
                 </span>
               </button>
             ))}
@@ -450,17 +450,18 @@ export function BoardroomChat() {
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder={`@${firstHandle}  ·  message the boardroom`}
+            placeholder={t.boardroomChat.messagePlaceholder}
             rows={1}
             className="flex-1 bg-transparent text-sm resize-none focus:outline-none placeholder:text-neutral-600 py-1 max-h-32"
           />
           <button
             onClick={send}
             disabled={!input.trim() || busyAgents.size > 0}
+            aria-label={t.chatUi.send}
             className="flex items-center gap-1.5 px-3 h-7 text-xs rounded-md bg-neutral-100 text-neutral-900 hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <Send className="w-3 h-3" />
-            Send
+            <Send className="w-3 h-3" aria-hidden />
+            {t.chatUi.send}
           </button>
         </div>
       </div>

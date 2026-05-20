@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useServers, serverLandingPath, type ServerRow } from "@/lib/server-context";
 import { UploadButton } from "@/components/upload-button";
 import { iconButton, ariaCurrent } from "@/lib/a11y";
+import { t } from "@/lib/i18n/es";
 
 const COLOR_MAP: Record<string, string> = {
   amber: "from-amber-500/30 to-amber-700/20 border-amber-500/40 text-amber-300",
@@ -91,7 +92,7 @@ export function Rail() {
         <UserPlus className="w-4 h-4" />
       </button>
       <button
-        title="Sync status"
+        aria-label={t.rail.syncStatus}
         onClick={() => setSettingsOpen("sync")}
         className="w-11 h-11 rounded-full hover:bg-neutral-900 text-neutral-600 hover:text-neutral-300 flex items-center justify-center"
       >
@@ -173,7 +174,7 @@ function ServerIcon({
         e.preventDefault();
         onEdit();
       }}
-      title={`${server.name} · right-click to edit`}
+      title={t.rail.editServer.serverIconTitle(server.name)}
       {...ariaCurrent(active)}
       className="relative group"
     >
@@ -237,9 +238,9 @@ function CreateServerModal({
       <div className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-semibold">Create server</h2>
+            <h2 className="text-lg font-semibold">{t.rail.createServer.title}</h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Servers hold your own channels + categories. Personal or shared.
+              {t.rail.createServer.subtitle}
             </p>
           </div>
           <button
@@ -260,13 +261,13 @@ function CreateServerModal({
           </div>
           <div className="flex-1">
             <label className="text-[10px] uppercase tracking-wider text-neutral-500">
-              Server name
+              {t.rail.createServer.serverName}
             </label>
             <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Workspace name"
+              placeholder={t.rail.createServer.serverNamePlaceholder}
               className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700 mt-1"
             />
           </div>
@@ -274,19 +275,19 @@ function CreateServerModal({
 
         <div className="mb-5">
           <label className="text-[10px] uppercase tracking-wider text-neutral-500 block mb-2">
-            Icon (1-2 chars or emoji)
+            {t.rail.createServer.icon}
           </label>
           <input
             value={icon}
             onChange={(e) => setIcon(e.target.value.slice(0, 4))}
-            placeholder="auto"
+            placeholder={t.rail.createServer.iconPlaceholder}
             className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700"
           />
         </div>
 
         <div className="mb-6">
           <label className="text-[10px] uppercase tracking-wider text-neutral-500 block mb-2">
-            Color
+            {t.rail.createServer.color}
           </label>
           <div className="flex gap-2">
             {COLOR_PICKS.map((c) => (
@@ -296,7 +297,8 @@ function CreateServerModal({
                 className={`w-8 h-8 rounded-lg bg-gradient-to-br border ${COLOR_MAP[c]} ${
                   color === c ? "ring-2 ring-white/40 ring-offset-2 ring-offset-[#0d0d0f]" : ""
                 }`}
-                title={c}
+                aria-label={c}
+                aria-pressed={color === c}
               />
             ))}
           </div>
@@ -307,14 +309,14 @@ function CreateServerModal({
             onClick={onClose}
             className="px-3 py-2 text-sm rounded-md border border-neutral-800 hover:bg-neutral-900"
           >
-            Cancel
+            {t.rail.createServer.cancel}
           </button>
           <button
             disabled={!name.trim()}
             onClick={() => onCreate({ name: name.trim(), icon: icon.trim(), color })}
             className="px-4 py-2 text-sm rounded-md bg-neutral-100 text-neutral-900 hover:bg-white disabled:opacity-40"
           >
-            Create
+            {t.rail.createServer.create}
           </button>
         </div>
       </div>
@@ -342,9 +344,9 @@ function EditServerModal({
       <div className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-semibold">Edit server</h2>
+            <h2 className="text-lg font-semibold">{t.rail.editServer.title}</h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Rename, change the icon, or recolor the wrapper.
+              {t.rail.editServer.subtitle}
             </p>
           </div>
           <button onClick={onClose} className="text-neutral-500 hover:text-neutral-300 p-1">
@@ -354,9 +356,7 @@ function EditServerModal({
 
         {isWarRoom && (
           <div className="mb-4 px-3 py-2 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-amber-200/90 leading-relaxed">
-            This is the canonical War Room. The brand mark + violet wrapper stay locked so the
-            shared dashboard reads the same across every install. Renaming is allowed if you
-            want to fork your own.
+            {t.rail.editServer.warRoomLocked}
           </div>
         )}
 
@@ -378,13 +378,13 @@ function EditServerModal({
           )}
           <div className="flex-1">
             <label className="text-[10px] uppercase tracking-wider text-neutral-500">
-              Server name
+              {t.rail.editServer.serverName}
             </label>
             <input
               autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Workspace name"
+              placeholder={t.rail.editServer.serverNamePlaceholder}
               className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700 mt-1"
             />
           </div>
@@ -392,13 +392,13 @@ function EditServerModal({
 
         <div className="mb-5">
           <label className="text-[10px] uppercase tracking-wider text-neutral-500 block mb-2">
-            Workspace image
+            {t.rail.editServer.workspaceImage}
           </label>
           <div className="flex items-center gap-2">
             <input
               value={iconUrl}
               onChange={(e) => setIconUrl(e.target.value)}
-              placeholder="https://... or click Upload"
+              placeholder={t.rail.editServer.workspaceImagePlaceholder}
               disabled={isWarRoom}
               className="flex-1 bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-xs font-mono focus:outline-none focus:border-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed"
             />
@@ -409,7 +409,7 @@ function EditServerModal({
               <button
                 onClick={() => setIconUrl("")}
                 className="text-[11px] text-neutral-500 hover:text-red-300"
-                title="Clear image"
+                aria-label={t.rail.clearImage}
               >
                 clear
               </button>
@@ -417,32 +417,32 @@ function EditServerModal({
           </div>
           {!isWarRoom && (
             <div className="text-[10px] text-neutral-600 mt-1">
-              Paste a URL or upload from your computer. Falls back to the letter glyph below when blank.
+              {t.rail.editServer.workspaceImageHint}
             </div>
           )}
         </div>
 
         <div className="mb-5">
           <label className="text-[10px] uppercase tracking-wider text-neutral-500 block mb-2">
-            Letter glyph (used when no image URL is set)
+            {t.rail.editServer.letterGlyph}
           </label>
           <input
             value={icon}
             onChange={(e) => setIcon(e.target.value.slice(0, 4))}
-            placeholder="auto"
+            placeholder={t.rail.editServer.letterGlyphPlaceholder}
             disabled={isWarRoom}
             className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed"
           />
           {isWarRoom && (
             <div className="text-[10px] text-neutral-600 mt-1">
-              Locked to the War Room mark.
+              {t.rail.editServer.letterGlyphHint}
             </div>
           )}
         </div>
 
         <div className="mb-6">
           <label className="text-[10px] uppercase tracking-wider text-neutral-500 block mb-2">
-            Color
+            {t.rail.editServer.color}
           </label>
           <div className="flex gap-2">
             {COLOR_PICKS.map((c) => (
@@ -453,13 +453,14 @@ function EditServerModal({
                 className={`w-8 h-8 rounded-lg bg-gradient-to-br border ${COLOR_MAP[c]} ${
                   color === c ? "ring-2 ring-white/40 ring-offset-2 ring-offset-[#0d0d0f]" : ""
                 } disabled:opacity-40 disabled:cursor-not-allowed`}
-                title={c}
+                aria-label={c}
+                aria-pressed={color === c}
               />
             ))}
           </div>
           {isWarRoom && (
             <div className="text-[10px] text-neutral-600 mt-1">
-              Locked to violet to match the brand.
+              {t.rail.editServer.colorLocked}
             </div>
           )}
         </div>
@@ -469,14 +470,14 @@ function EditServerModal({
             onClick={onClose}
             className="px-3 py-2 text-sm rounded-md border border-neutral-800 hover:bg-neutral-900"
           >
-            Cancel
+            {t.rail.editServer.cancel}
           </button>
           <button
             disabled={!name.trim()}
             onClick={() => onSave({ name: name.trim(), icon: icon.trim(), color, iconUrl: iconUrl.trim() || null })}
             className="px-4 py-2 text-sm rounded-md bg-neutral-100 text-neutral-900 hover:bg-white disabled:opacity-40"
           >
-            Save
+            {t.rail.editServer.save}
           </button>
         </div>
       </div>

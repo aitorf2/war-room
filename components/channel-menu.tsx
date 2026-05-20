@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { Lock, LockOpen, Trash2, Copy, Hash, Settings2 } from "lucide-react";
 import type { Channel } from "@/lib/channels";
+import { t } from "@/lib/i18n/es";
 
 type Props = {
   channel: Channel;
@@ -58,7 +59,7 @@ export function ChannelMenu({
 
       <MenuItem
         icon={<Settings2 className="w-3.5 h-3.5" />}
-        label="Edit channel…"
+        label={t.channelMenu.editChannel}
         onClick={() => {
           onEdit();
         }}
@@ -73,7 +74,7 @@ export function ChannelMenu({
             <Lock className="w-3.5 h-3.5" />
           )
         }
-        label={channel.isPrivate ? "Make public" : "Make private"}
+        label={channel.isPrivate ? t.channelMenu.makePublic : t.channelMenu.makePrivate}
         onClick={() => {
           onTogglePrivacy();
           onClose();
@@ -83,7 +84,7 @@ export function ChannelMenu({
 
       <MenuItem
         icon={<Copy className="w-3.5 h-3.5" />}
-        label="Copy channel link"
+        label={t.channelMenu.copyChannelLink}
         onClick={() => {
           navigator.clipboard.writeText(`${location.origin}/c/${channel.id}`);
           onClose();
@@ -96,9 +97,9 @@ export function ChannelMenu({
           <div className="my-1 border-t border-neutral-800" />
           <MenuItem
             icon={<Trash2 className="w-3.5 h-3.5" />}
-            label={`Delete #${channel.name}`}
+            label={t.channelMenu.deleteChannel(channel.name)}
             onClick={() => {
-              if (confirm(`Delete #${channel.name}?`)) {
+              if (confirm(t.channelMenu.deleteConfirm(channel.name))) {
                 onDelete();
               }
               onClose();

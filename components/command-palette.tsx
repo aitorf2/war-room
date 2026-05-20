@@ -17,6 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { serverLandingPath, useServers } from "@/lib/server-context";
+import { t } from "@/lib/i18n/es";
 
 type Item =
   | {
@@ -140,7 +141,7 @@ export function CommandPalette() {
         kind: "server",
         id: `sv-${s.id}`,
         label: s.name,
-        hint: "Switch server",
+        hint: t.commandPalette.switchServer,
         serverId: s.id,
         serverIcon: s.icon,
         serverColor: s.color,
@@ -155,32 +156,32 @@ export function CommandPalette() {
       {
         kind: "action" as const,
         id: "act-home",
-        label: "Go to The War Room home",
-        hint: "Navigate",
+        label: t.commandPalette.goHome,
+        hint: t.commandPalette.hintNavigate,
         icon: Home,
         action: () => router.push("/c/home"),
       },
       {
         kind: "action" as const,
         id: "act-activity",
-        label: "Open activity feed",
-        hint: "System channel",
+        label: t.commandPalette.openActivity,
+        hint: t.commandPalette.hintSystemChannel,
         icon: Activity,
         action: () => router.push("/c/system/activity"),
       },
       {
         kind: "action" as const,
         id: "act-services",
-        label: "Open services health",
-        hint: "System channel",
+        label: t.commandPalette.openServices,
+        hint: t.commandPalette.hintSystemChannel,
         icon: Server,
         action: () => router.push("/c/system/services"),
       },
       {
         kind: "action" as const,
         id: "act-approvals",
-        label: "Open approvals queue",
-        hint: "System channel",
+        label: t.commandPalette.openApprovals,
+        hint: t.commandPalette.hintSystemChannel,
         icon: CheckSquare,
         action: () => router.push("/c/system/approvals"),
       },
@@ -273,7 +274,7 @@ export function CommandPalette() {
               setCursor(0);
             }}
             onKeyDown={onKey}
-            placeholder="Search channels, servers, actions…"
+            placeholder={t.commandPalette.searchPlaceholder}
             className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-neutral-600"
           />
           <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-500 font-mono">
@@ -283,9 +284,9 @@ export function CommandPalette() {
 
         <div ref={listRef} className="overflow-y-auto flex-1 py-2">
           {!data ? (
-            <div className="px-4 py-8 text-center text-xs text-neutral-600">Loading…</div>
+            <div className="px-4 py-8 text-center text-xs text-neutral-600">{t.commandPalette.loading}</div>
           ) : filtered.length === 0 ? (
-            <div className="px-4 py-8 text-center text-xs text-neutral-600">No matches.</div>
+            <div className="px-4 py-8 text-center text-xs text-neutral-600">{t.commandPalette.noMatches}</div>
           ) : (
             <Sections items={filtered} cursor={cursor} setCursor={setCursor} onSelect={onSelect} />
           )}
@@ -293,19 +294,19 @@ export function CommandPalette() {
 
         <div className="border-t border-neutral-800 px-4 py-2 flex items-center gap-4 text-[10px] text-neutral-600 uppercase tracking-wider">
           <span className="flex items-center gap-1">
-            <ArrowUp className="w-3 h-3" />
-            <ArrowDown className="w-3 h-3" />
-            Navigate
+            <ArrowUp className="w-3 h-3" aria-hidden />
+            <ArrowDown className="w-3 h-3" aria-hidden />
+            {t.commandPalette.navigate}
           </span>
           <span className="flex items-center gap-1">
-            <CornerDownLeft className="w-3 h-3" />
-            Select
+            <CornerDownLeft className="w-3 h-3" aria-hidden />
+            {t.commandPalette.select}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="text-[9px] px-1 rounded bg-neutral-900 border border-neutral-800 font-mono">
               ⌘K
             </kbd>
-            Open / close
+            {t.commandPalette.openClose}
           </span>
           <Sparkles className="w-3 h-3 ml-auto text-amber-400/60" />
         </div>
@@ -326,9 +327,9 @@ function Sections({
   onSelect: (it: Item) => void;
 }) {
   const groups = {
-    Channels: items.filter((i) => i.kind === "channel"),
-    Servers: items.filter((i) => i.kind === "server"),
-    Actions: items.filter((i) => i.kind === "action"),
+    [t.commandPalette.groups.channels]: items.filter((i) => i.kind === "channel"),
+    [t.commandPalette.groups.servers]: items.filter((i) => i.kind === "server"),
+    [t.commandPalette.groups.actions]: items.filter((i) => i.kind === "action"),
   };
   let idx = 0;
   return (

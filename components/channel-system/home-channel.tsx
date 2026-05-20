@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PulseDot } from "@/components/pulse-dot";
 import { Sparkles, Server, Activity as ActivityIcon, MessageSquare, Wrench } from "lucide-react";
 import type { HealthReport } from "@/lib/services-check";
+import { t } from "@/lib/i18n/es";
 
 type ActivityRow = {
   id: number;
@@ -52,53 +53,53 @@ export function HomeChannel() {
     <div className="flex-1 overflow-y-auto px-6 py-5">
       <div className="flex items-center gap-2 mb-1">
         <Sparkles className="w-5 h-5 text-amber-400" />
-        <h2 className="text-2xl font-semibold tracking-tight">Welcome to The War Room</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">{t.home.title}</h2>
       </div>
       <p className="text-sm text-neutral-500 mb-6">
-        Local cockpit · Localhost · $0 infra
+        {t.home.subtitle}
       </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         <Tile
-          icon={<Server className="w-4 h-4" />}
-          label="VPS"
+          icon={<Server className="w-4 h-4" aria-hidden />}
+          label={t.home.vpsLabel}
           value={vpsOk === null ? "…" : `${vpsOnline}/${vpsTotal}`}
           tone={vpsOk === null ? "idle" : vpsOk ? "ok" : "bad"}
-          sub="services up"
+          sub={t.home.vpsServices}
           href="/c/system/services"
         />
         <Tile
-          icon={<ActivityIcon className="w-4 h-4" />}
-          label="Local"
+          icon={<ActivityIcon className="w-4 h-4" aria-hidden />}
+          label={t.home.localLabel}
           value={localOk === null ? "…" : localOk ? "OK" : "down"}
           tone={localOk === null ? "idle" : localOk ? "ok" : "warn"}
-          sub="daemons"
+          sub={t.home.localDaemons}
           href="/c/system/services"
         />
         <Tile
-          icon={<Wrench className="w-4 h-4" />}
-          label="Env"
-          value={envOk === null ? "…" : envOk ? `${health?.env.reduce((n, e) => n + e.keys.length, 0) ?? 0}` : "missing"}
+          icon={<Wrench className="w-4 h-4" aria-hidden />}
+          label={t.home.envLabel}
+          value={envOk === null ? "…" : envOk ? `${health?.env.reduce((n, e) => n + e.keys.length, 0) ?? 0}` : "–"}
           tone={envOk === null ? "idle" : envOk ? "ok" : "warn"}
-          sub="keys loaded"
+          sub={t.home.envKeys}
           href="/c/system/services"
         />
         <Tile
-          icon={<MessageSquare className="w-4 h-4" />}
-          label="Sessions"
+          icon={<MessageSquare className="w-4 h-4" aria-hidden />}
+          label={t.home.sessionsLabel}
           value={sessions === null ? "…" : `${sessions.length}`}
           tone={sessions === null ? "idle" : sessions.length > 0 ? "ok" : "idle"}
-          sub="tracked"
+          sub={t.home.sessionsTracked}
           href="/c/system/sessions"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Panel title="Recent activity" subtitle={activity === null ? "…" : `${activity.length} events`}>
+        <Panel title={t.home.recentActivity} subtitle={activity === null ? "…" : t.home.recentActivityCount(activity.length)}>
           {activity === null ? (
             <SkeletonList count={5} />
           ) : activity.length === 0 ? (
-            <Empty text="No activity yet." />
+            <Empty text={t.home.noActivity} />
           ) : (
             <div className="flex flex-col">
               {activity.slice(0, 10).map((a) => (
@@ -118,11 +119,11 @@ export function HomeChannel() {
           )}
         </Panel>
 
-        <Panel title="Active sessions" subtitle={sessions === null ? "…" : `${sessions.length} tracked`}>
+        <Panel title={t.home.activeSessions} subtitle={sessions === null ? "…" : t.home.activeSessionsCount(sessions.length)}>
           {sessions === null ? (
             <SkeletonList count={4} />
           ) : sessions.length === 0 ? (
-            <Empty text="No sessions yet. Pick a channel and send a message." />
+            <Empty text={t.home.noSessions} />
           ) : (
             <div className="flex flex-col">
               {sessions.slice(0, 8).map((s) => {
