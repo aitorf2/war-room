@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { Channel } from "@/lib/channels";
 import { FilesPanel } from "./files-panel";
+import { t } from "@/lib/i18n/es";
 
 type AdapterMeta = {
   id: string;
@@ -56,7 +57,7 @@ export function ChannelHeader({
       <div className="text-sm font-medium">{channel.name}</div>
       {channel.isPrivate && (
         <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
-          private
+          {t.header.privateChannel}
         </span>
       )}
       {channel.description && (
@@ -84,23 +85,24 @@ export function ChannelHeader({
         {channel.projectPath && (
           <OpenInEditorBtn projectPath={channel.projectPath} />
         )}
-        <IconBtn title="Files" onClick={() => setFilesOpen(true)}>
-          <Paperclip className="w-4 h-4" />
+        <IconBtn title={t.header.files} onClick={() => setFilesOpen(true)}>
+          <Paperclip className="w-4 h-4" aria-hidden />
         </IconBtn>
         <div className="relative">
-          <IconBtn title="Pinned" onClick={() => setPinnedOpen((v) => !v)}>
-            <Pin className="w-4 h-4" />
+          <IconBtn title={t.header.pinned} onClick={() => setPinnedOpen((v) => !v)}>
+            <Pin className="w-4 h-4" aria-hidden />
           </IconBtn>
           {pinnedOpen && (
             <PinnedPopover channelId={channel.id} onClose={() => setPinnedOpen(false)} />
           )}
         </div>
-        <IconBtn title="Notifications"><Bell className="w-4 h-4" /></IconBtn>
-        <IconBtn title="Members" onClick={onToggleRight}><Users className="w-4 h-4" /></IconBtn>
+        <IconBtn title={t.header.notifications}><Bell className="w-4 h-4" aria-hidden /></IconBtn>
+        <IconBtn title={t.header.members} onClick={onToggleRight}><Users className="w-4 h-4" aria-hidden /></IconBtn>
         <div className="relative ml-2">
-          <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-neutral-600" />
+          <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-neutral-600" aria-hidden />
           <input
-            placeholder="Search"
+            aria-label={t.header.searchChannels}
+            placeholder={t.header.searchChannels}
             className="w-44 bg-neutral-900 border border-neutral-800 rounded-md text-xs pl-7 pr-2 py-1 focus:outline-none focus:border-neutral-700"
           />
         </div>
@@ -168,18 +170,18 @@ function PinnedPopover({
       <div className="fixed inset-0 z-30" onClick={onClose} />
       <div className="absolute right-0 top-full mt-1 z-40 w-96 max-h-[60vh] bg-[#0d0d0f] border border-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col">
         <div className="px-3 py-2 border-b border-neutral-800 flex items-center gap-2">
-          <Pin className="w-3.5 h-3.5 text-amber-400" />
-          <span className="text-xs font-semibold text-neutral-200">Pinned messages</span>
-          <span className="ml-auto text-[10px] text-neutral-600">
-            {items === null ? "..." : `${items.length}`}
+          <Pin className="w-3.5 h-3.5 text-amber-400" aria-hidden />
+          <span className="text-xs font-semibold text-neutral-200">{t.header.pinnedTitle}</span>
+          <span className="ml-auto text-[10px] text-neutral-600" aria-hidden>
+            {items === null ? "…" : `${items.length}`}
           </span>
         </div>
-        <div className="overflow-y-auto flex-1">
+        <div className="overflow-y-auto flex-1" role="list" aria-label={t.header.pinnedTitle}>
           {items === null ? (
-            <div className="p-4 text-xs text-neutral-600 italic">Loading...</div>
+            <div className="p-4 text-xs text-neutral-600 italic">{t.header.pinnedLoading}</div>
           ) : items.length === 0 ? (
             <div className="p-4 text-xs text-neutral-600 italic">
-              Nothing pinned yet. Hover any message and click the pin icon to save it here.
+              {t.header.pinnedEmpty}
             </div>
           ) : (
             items.map((p) => (
@@ -189,14 +191,14 @@ function PinnedPopover({
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] uppercase tracking-wider text-neutral-500">
-                    {p.role === "user" ? "you" : p.agent_id ?? "agent"}
+                    {p.role === "user" ? t.header.pinnedYou : p.agent_id ?? "agent"}
                   </span>
                   <button
                     onClick={() => remove(p.id)}
+                    aria-label={t.header.pinnedUnpin}
                     className="opacity-0 group-hover:opacity-100 text-[10px] text-neutral-500 hover:text-red-300"
-                    title="Unpin"
                   >
-                    unpin
+                    {t.header.pinnedUnpin}
                   </button>
                 </div>
                 <div className="text-xs text-neutral-300 whitespace-pre-wrap line-clamp-6">
@@ -226,6 +228,7 @@ function IconBtn({
   return (
     <button
       title={title}
+      aria-label={title}
       onClick={onClick}
       className="w-8 h-8 rounded-md hover:bg-neutral-900 hover:text-neutral-300 flex items-center justify-center"
     >
@@ -454,11 +457,10 @@ function AgentChip({
     <div className="relative" ref={popRef}>
       <button
         onClick={() => setOpen((v) => !v)}
-        title={
-          pin
-            ? `Primary AI: ${label} · @mention another agent in chat to call them ad-hoc`
-            : `No primary set · using global default (${label}) · @mention any agent to override per-turn`
-        }
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label={pin ? t.header.agentChipPinned(label) : t.header.agentChipDefault(label)}
+        title={pin ? t.header.agentChipPinned(label) : t.header.agentChipDefault(label)}
         className={`flex items-center gap-1.5 px-2 h-7 rounded-md border text-[11px] transition-colors ${
           pin
             ? "border-amber-500/40 bg-amber-500/10 text-amber-200 hover:bg-amber-500/20"
@@ -474,34 +476,42 @@ function AgentChip({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-30 w-72 bg-[#0d0d0f] border border-neutral-800 rounded-lg shadow-2xl overflow-hidden">
-          <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-800 flex items-center gap-1.5">
+        <div
+          role="dialog"
+          aria-label={t.header.agentChipOpen}
+          className="absolute right-0 top-full mt-1 z-30 w-72 bg-[#0d0d0f] border border-neutral-800 rounded-lg shadow-2xl overflow-hidden"
+        >
+          <div className="px-3 py-2 text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-800 flex items-center gap-1.5" aria-hidden>
             <Sparkles className="w-3 h-3 text-amber-400" />
-            Primary AI for this channel
+            {t.header.primaryAI}
           </div>
           <button
             onClick={() => setPinned(null)}
+            aria-pressed={!pin}
             className={`w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-neutral-900 ${
               !pin ? "bg-neutral-900/80" : ""
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-neutral-600 shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-neutral-600 shrink-0" aria-hidden />
             <div className="flex-1 min-w-0">
-              <div className="text-neutral-200">Use global default</div>
+              <div className="text-neutral-200">{t.header.useGlobalDefault}</div>
               <div className="text-[10px] text-neutral-500 truncate">
                 {adapters.find((a) => a.id === activeId)?.name ?? activeId}
               </div>
             </div>
-            {!pin && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+            {!pin && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden />}
           </button>
           <div className="border-t border-neutral-900" />
-          <div className="max-h-72 overflow-y-auto">
+          <div className="max-h-72 overflow-y-auto" role="list" aria-label={t.header.primaryAI}>
             {adapters.map((a) => {
               const isPinned = pin === a.id;
               return (
                 <button
                   key={a.id}
+                  role="listitem"
                   onClick={() => setPinned(a.id)}
+                  aria-pressed={isPinned}
+                  aria-label={`${a.name}, ${a.isConfigured ? t.header.agentChipConfigured : t.header.agentChipNotConfigured}${isPinned ? ", seleccionado" : ""}`}
                   className={`w-full flex items-center gap-2 px-3 py-2 text-xs text-left hover:bg-neutral-900 ${
                     isPinned ? "bg-neutral-900/80" : ""
                   }`}
@@ -510,31 +520,28 @@ function AgentChip({
                     className={`w-2 h-2 rounded-full shrink-0 ${
                       a.isConfigured ? "bg-emerald-500" : "bg-neutral-700"
                     }`}
-                    title={a.isConfigured ? "Configured" : "Needs setup"}
+                    aria-hidden
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-neutral-200 truncate">{a.name}</div>
                     <div className="text-[10px] text-neutral-500 uppercase tracking-wider">
-                      {a.kind === "cli" ? "CLI bridge" : "API"}
+                      {a.kind === "cli" ? t.header.cliBridge : t.header.apiDirect}
                     </div>
                   </div>
-                  {isPinned && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                  {isPinned && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" aria-hidden />}
                 </button>
               );
             })}
           </div>
           <div className="px-3 py-2 border-t border-neutral-900 text-[10px] text-neutral-600 leading-snug">
-            The primary handles every message by default in this channel. Other agents stay
-            reachable, just <code className="text-neutral-500">@mention</code> them in chat to
-            route a single turn elsewhere. Unconfigured agents (grey dot) will fail until you
-            set them up under Settings → Agent.
+            {t.header.primaryHint}
           </div>
           {adapters.length > 0 && (
             <div className="px-3 py-2 border-t border-neutral-900">
-              <div className="text-[9px] uppercase tracking-wider text-neutral-600 mb-1.5">
-                @mention handles
+              <div className="text-[9px] uppercase tracking-wider text-neutral-600 mb-1.5" aria-hidden>
+                {t.header.mentionHandles}
               </div>
-              <div className="flex flex-wrap gap-1">
+              <div className="flex flex-wrap gap-1" aria-label={t.header.mentionHandles}>
                 {adapters.map((a) => {
                   const stem = a.id.replace(/-(cli|api)$/i, "");
                   const collides = adapters.filter(
@@ -544,7 +551,7 @@ function AgentChip({
                   return (
                     <span
                       key={a.id}
-                      title={a.name}
+                      aria-label={`@${handle}, ${a.isConfigured ? t.header.agentChipConfigured : t.header.agentChipNotConfigured}`}
                       className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono ${
                         a.isConfigured
                           ? "bg-neutral-800 text-neutral-300"
@@ -557,54 +564,55 @@ function AgentChip({
                 })}
               </div>
               <div className="text-[9px] text-neutral-700 mt-1.5 leading-snug">
-                Strikethrough means not configured. Enable shared context to let agents see each other&apos;s replies.
+                {t.header.mentionHint}
               </div>
             </div>
           )}
 
-          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5" aria-hidden>
             <Sparkles className="w-3 h-3 text-amber-400" />
-            Cross-agent context
+            {t.header.crossAgentContext}
           </div>
-          <div className="px-3 py-2 flex flex-col gap-2">
+          <div className="px-3 py-2 flex flex-col gap-2" role="group" aria-label={t.header.crossAgentContext}>
             <div className="flex gap-1.5">
               <button
                 onClick={() => {
                   setMode("isolated");
                   void persistContext({ mode: "isolated" });
                 }}
+                aria-pressed={mode === "isolated"}
                 className={`flex-1 px-2 py-1.5 text-[11px] rounded border transition-colors ${
                   mode === "isolated"
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-200"
                     : "border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700"
                 }`}
               >
-                Isolated
+                {t.header.contextIsolated}
               </button>
               <button
                 onClick={() => {
                   setMode("shared");
                   void persistContext({ mode: "shared" });
                 }}
+                aria-pressed={mode === "shared"}
                 className={`flex-1 px-2 py-1.5 text-[11px] rounded border transition-colors ${
                   mode === "shared"
                     ? "border-amber-500/50 bg-amber-500/10 text-amber-200"
                     : "border-neutral-800 bg-neutral-900 text-neutral-300 hover:border-neutral-700"
                 }`}
               >
-                Shared
+                {t.header.contextShared}
               </button>
             </div>
             <div className="text-[10px] text-neutral-600 leading-snug">
-              <strong className="text-neutral-500">Isolated</strong>: each agent only sees its own
-              past replies (default). <strong className="text-neutral-500">Shared</strong>: every
-              agent gets the recent cross-agent thread prepended as context, attributed by{" "}
+              <strong className="text-neutral-500">{t.header.contextIsolated}</strong>: {t.header.contextIsolatedHint}{" "}
+              <strong className="text-neutral-500">{t.header.contextShared}</strong>: {t.header.contextSharedHint}{" "}
               <code className="text-neutral-500">@handle</code>.
             </div>
             {mode === "shared" && (
               <div className="grid grid-cols-2 gap-2 mt-1">
                 <BudgetField
-                  label="Max messages"
+                  label={t.header.contextMaxMessages}
                   value={msgBudget}
                   min={1}
                   max={200}
@@ -614,7 +622,7 @@ function AgentChip({
                   }}
                 />
                 <BudgetField
-                  label="Max chars"
+                  label={t.header.contextMaxChars}
                   value={charBudget}
                   min={100}
                   max={50_000}
@@ -628,13 +636,14 @@ function AgentChip({
             )}
           </div>
 
-          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5" aria-hidden>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/openwar-logo.svg" alt="" className="w-3 h-3" />
-            Agent framework
+            {t.header.agentFramework}
           </div>
           <div className="px-3 py-2 flex flex-col gap-2">
             <select
+              aria-label={t.header.frameworkSelectLabel}
               value={framework ?? "__inherit__"}
               onChange={(e) => {
                 const v = e.target.value;
@@ -644,12 +653,13 @@ function AgentChip({
               className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-[11px] focus:outline-none focus:border-neutral-700"
             >
               <option value="__inherit__">
-                Inherit global default
-                {defaultFramework
-                  ? ` (${frameworkList.find((f) => f.id === defaultFramework)?.name ?? defaultFramework})`
-                  : " (none)"}
+                {t.header.frameworkInherit(
+                  defaultFramework
+                    ? (frameworkList.find((f) => f.id === defaultFramework)?.name ?? defaultFramework)
+                    : ""
+                )}
               </option>
-              <option value="none">None, raw model behavior</option>
+              <option value="none">{t.header.frameworkNone}</option>
               {frameworkList.map((f) => (
                 <option key={f.id} value={f.id}>
                   {f.name}
@@ -657,14 +667,13 @@ function AgentChip({
               ))}
             </select>
             <div className="text-[10px] text-neutral-600 leading-snug">
-              Framework prepended to every message in this channel as a system preamble. OpenWar
-              ships built-in; install more by dropping markdown files in{" "}
+              {t.header.frameworkHint}{" "}
               <code className="text-neutral-500">presets/frameworks/</code>.
             </div>
           </div>
 
-          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500">
-            War Room primer
+          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500" aria-hidden>
+            {t.header.warRoomPrimer}
           </div>
           <div className="px-3 py-2">
             <PrimerToggle channelId={channelId} />
@@ -673,12 +682,13 @@ function AgentChip({
           {/* Sub-agent picker: only useful when primary adapter is claude-cli */}
           {(pin === "claude-cli" || (!pin && activeId === "claude-cli")) && catalog.length > 0 && (
             <>
-              <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+              <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5" aria-hidden>
                 <Bot className="w-3 h-3 text-sky-400" />
-                Claude sub-agent
+                {t.header.claudeSubAgent}
               </div>
               <div className="px-3 py-2 flex flex-col gap-2">
                 <select
+                  aria-label={t.header.subAgentSelectLabel}
                   value={subAgentId ?? "__none__"}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -686,7 +696,7 @@ function AgentChip({
                   }}
                   className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-[11px] focus:outline-none focus:border-neutral-700"
                 >
-                  <option value="__none__">Claude picks the agent</option>
+                  <option value="__none__">{t.header.subAgentClaudePicks}</option>
                   {catalog.map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.id}
@@ -699,23 +709,22 @@ function AgentChip({
                   </div>
                 )}
                 <div className="text-[10px] text-neutral-600 leading-snug">
-                  Forces every message in this channel through the selected agent via{" "}
-                  <code className="text-neutral-500">--agent</code>. Leave blank to let Claude
-                  choose based on the task.
+                  {t.header.subAgentHint}
                 </div>
               </div>
             </>
           )}
 
           {/* Supervisor: lightweight meta-agent watching the channel */}
-          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+          <div className="px-3 py-2 border-t border-neutral-800 text-[10px] uppercase tracking-wider text-neutral-500 flex items-center gap-1.5" aria-hidden>
             <Sparkles className="w-3 h-3 text-violet-400" />
-            Supervisor
+            {t.header.supervisorSection}
           </div>
-          <div className="px-3 py-2 flex flex-col gap-2">
+          <div className="px-3 py-2 flex flex-col gap-2" role="group" aria-label={t.header.supervisorSection}>
             <div className="flex items-center gap-2">
               <select
                 disabled={!supervisorLoaded}
+                aria-label={t.header.supervisorSelectLabel}
                 value={supervisorAgentId ?? "__none__"}
                 onChange={(e) => {
                   const v = e.target.value;
@@ -723,7 +732,7 @@ function AgentChip({
                 }}
                 className="flex-1 bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-[11px] focus:outline-none focus:border-neutral-700"
               >
-                <option value="__none__">Disabled</option>
+                <option value="__none__">{t.header.supervisorDisabled}</option>
                 {catalog.length > 0 ? (
                   catalog.map((a) => (
                     <option key={a.id} value={a.id}>
@@ -736,7 +745,7 @@ function AgentChip({
               </select>
               {supervisorAgentId && (
                 <BudgetField
-                  label="every N"
+                  label={t.header.supervisorEveryNLabel}
                   value={supervisorEveryN || 5}
                   min={1}
                   max={50}
@@ -746,8 +755,8 @@ function AgentChip({
             </div>
             <div className="text-[10px] text-neutral-600 leading-snug">
               {supervisorAgentId
-                ? `${supervisorAgentId} reads the last 20 messages every ${supervisorEveryN || 5} turns and injects a brief improvement note.`
-                : "Pick an agent to activate lightweight live supervision of this channel."}
+                ? t.header.supervisorActiveHint(supervisorAgentId, supervisorEveryN || 5)
+                : t.header.supervisorInactiveHint}
             </div>
           </div>
         </div>
@@ -809,6 +818,7 @@ function PrimerToggle({ channelId }: { channelId: string }) {
     <div className="flex flex-col gap-2">
       <select
         disabled={!loaded || !primerLoaded}
+        aria-label={t.header.primerSelectLabel}
         value={value}
         onChange={(e) => {
           const v = e.target.value;
@@ -816,24 +826,20 @@ function PrimerToggle({ channelId }: { channelId: string }) {
         }}
         className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-[11px] focus:outline-none focus:border-neutral-700"
       >
-        <option value="__inherit__">
-          Inherit global default ({defaultEnabled ? "on" : "off"})
-        </option>
-        <option value="on">On - agent learns the War Room model</option>
-        <option value="off">Off - raw agent, no War Room context</option>
+        <option value="__inherit__">{t.header.primerInherit(defaultEnabled)}</option>
+        <option value="on">{t.header.primerOn}</option>
+        <option value="off">{t.header.primerOff}</option>
       </select>
       <div className="text-[10px] text-neutral-600 leading-snug">
         {primerLoaded ? (
           <>
-            Currently <strong className={effective ? "text-emerald-400" : "text-neutral-400"}>{effective ? "on" : "off"}</strong>{" "}
-            for this channel. When on, your agent learns it&apos;s inside War Room and can log
-            decisions, post announcements, and add knowledge entries via tool use.
+            <strong className={effective ? "text-emerald-400" : "text-neutral-400"}>
+              {effective ? t.header.primerOnDesc : t.header.primerOffDesc}
+            </strong>{" "}
+            {effective ? t.header.primerHintOn : t.header.primerHintOff}
           </>
         ) : (
-          <span className="text-amber-400">
-            Primer file not bundled in this build. Drop one at{" "}
-            <code>presets/agent-primer/war-room.md</code>.
-          </span>
+          <span className="text-amber-400">{t.header.primerMissing}</span>
         )}
       </div>
     </div>
@@ -854,8 +860,8 @@ function FrameworkSwitchModal({
   onConfirm: () => void;
 }) {
   const label = (id: string | null) => {
-    if (id === null) return "Inherit global default";
-    if (id === "none") return "None, raw model behavior";
+    if (id === null) return t.header.frameworkInheritLabel;
+    if (id === "none") return t.header.frameworkNoneLabel;
     return adapters.find((a) => a.id === id)?.name ?? id;
   };
   useEffect(() => {
@@ -872,33 +878,29 @@ function FrameworkSwitchModal({
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
-      aria-label="Confirm framework switch"
+      aria-label={t.header.frameworkSwitchTitle}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl shadow-2xl w-full max-w-md p-6"
       >
-        <h2 className="text-lg font-semibold mb-2">Switch framework mid-conversation?</h2>
+        <h2 className="text-lg font-semibold mb-2">{t.header.frameworkSwitchTitle}</h2>
         <p className="text-sm text-neutral-400 leading-relaxed mb-4">
-          You&apos;re changing the agent framework from{" "}
-          <strong className="text-neutral-200">{label(fromId)}</strong> to{" "}
-          <strong className="text-neutral-200">{label(toId)}</strong>. The agent&apos;s next turn
-          uses the new framework. Existing context in this channel stays as-is. CLI agents with
-          their own session memory will not retroactively re-read prior turns under the new rules.
+          {t.header.frameworkSwitchBody(label(fromId), label(toId))}
         </p>
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={onCancel}
             className="px-3 py-2 text-sm rounded-md border border-neutral-800 hover:bg-neutral-900"
           >
-            Cancel
+            {t.header.frameworkSwitchCancel}
           </button>
           <button
             onClick={onConfirm}
             autoFocus
             className="px-4 py-2 text-sm rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-200 hover:bg-amber-500/30"
           >
-            Switch framework
+            {t.header.frameworkSwitchConfirm}
           </button>
         </div>
       </div>
@@ -950,10 +952,10 @@ function OpenInEditorBtn({ projectPath }: { projectPath: string }) {
 
   return (
     <IconBtn
-      title={error ?? `Open in ${editorName}`}
+      title={error ? t.header.openInEditorFailed : t.header.openInEditor(editorName)}
       onClick={opening ? undefined : open}
     >
-      <FolderOpen className={`w-4 h-4 ${error ? "text-red-400" : ""}`} />
+      <FolderOpen className={`w-4 h-4 ${error ? "text-red-400" : ""}`} aria-hidden />
     </IconBtn>
   );
 }

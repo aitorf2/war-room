@@ -7,6 +7,7 @@ import { Send, Square, Slash, Sparkles, Pin as PinIcon } from "lucide-react";
 import { localMember } from "@/lib/team";
 import { useIdentityVersion } from "@/lib/use-identity-version";
 import { chatLogProps, composerProps, iconButton, statusRegionProps } from "@/lib/a11y";
+import { t } from "@/lib/i18n/es";
 
 const LOCAL = localMember();
 
@@ -323,7 +324,7 @@ export function ChannelChat({
             ...cur,
             {
               kind: "system",
-              text: `Framework "${fwId}" not found in presets/frameworks/. Falling back to no framework for this turn. Pick another in the AI chip popover.`,
+              text: t.chatUi.frameworkMissing(fwId),
               id: `fw-${Date.now()}`,
               ts: Date.now(),
             },
@@ -431,13 +432,13 @@ function Welcome({
         className="w-20 h-20 [image-rendering:pixelated] shrink-0"
       />
       <div className="flex-1 min-w-0">
-        <div className="text-2xl font-semibold mb-1">Welcome to #{channelName}.</div>
+        <div className="text-2xl font-semibold mb-1">{t.chatUi.welcomeTitle(channelName)}</div>
         {description ? (
           <div className="text-sm text-neutral-300 mb-3 max-w-2xl">{description}</div>
         ) : (
           <div className="text-sm text-neutral-500 mb-3">
-            This is the start of the{" "}
-            <span className="text-neutral-300 font-medium">#{channelName}</span> channel.
+            {t.chatUi.welcomeStart}{" "}
+            <span className="text-neutral-300 font-medium">#{channelName}</span>.
           </div>
         )}
         <div className="text-xs text-neutral-500 flex items-center gap-2">
@@ -470,11 +471,15 @@ function ChatMessage({
   }
   if (item.kind === "supervisor") {
     return (
-      <div className="mx-4 my-3 px-3 py-2.5 rounded-lg border border-violet-500/30 bg-violet-500/5 flex gap-2.5">
-        <Sparkles className="w-3.5 h-3.5 text-violet-400 mt-0.5 shrink-0" />
+      <div
+        role="note"
+        aria-label={t.chatUi.agentSupervisorNote(item.agentId)}
+        className="mx-4 my-3 px-3 py-2.5 rounded-lg border border-violet-500/30 bg-violet-500/5 flex gap-2.5"
+      >
+        <Sparkles className="w-3.5 h-3.5 text-violet-400 mt-0.5 shrink-0" aria-hidden />
         <div>
           <div className="text-[10px] uppercase tracking-wider text-violet-500 mb-1">
-            {item.agentId} · supervisor note
+            {t.chatUi.agentSupervisorNote(item.agentId)}
           </div>
           <div className="text-xs text-violet-200/80 leading-relaxed">{item.text}</div>
         </div>
@@ -634,17 +639,17 @@ function FirstChatHint({
       <div className="flex items-center gap-3 text-xs text-neutral-500 border border-neutral-800/70 rounded-lg bg-neutral-900/30 px-3 py-2">
         <Sparkles className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
         <span className="min-w-0 flex-1 truncate">
-          New here? Try{" "}
-          <code className="text-neutral-300 bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded">
+          {t.chatUi.firstChatHint("")}
+          <code className="text-neutral-300 bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded ml-1">
             {suggestion}
-          </code>{" "}
-          to see what your agent can do.
+          </code>
         </span>
         <button
           onClick={() => onUse(suggestion)}
+          aria-label={`${t.chatUi.firstChatUse}: ${suggestion}`}
           className="shrink-0 text-amber-300 hover:text-amber-200 underline underline-offset-2"
         >
-          Use this
+          {t.chatUi.firstChatUse}
         </button>
       </div>
     </div>
@@ -699,26 +704,28 @@ function Composer({
         {streaming ? (
           <button
             onClick={onStop}
+            aria-label={t.agent.stopAgent}
             className="flex items-center gap-1.5 px-3 h-8 text-xs rounded-md border border-red-900/60 bg-red-950/40 text-red-200 hover:bg-red-950"
           >
-            <Square className="w-3.5 h-3.5" />
-            Stop
+            <Square className="w-3.5 h-3.5" aria-hidden />
+            {t.chatUi.stop}
           </button>
         ) : (
           <button
             onClick={onSend}
             disabled={!value.trim()}
+            aria-label={t.chatUi.send}
             className="flex items-center gap-1.5 px-3 h-8 text-xs rounded-md bg-neutral-100 text-neutral-900 hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <Send className="w-3.5 h-3.5" />
-            Send
+            <Send className="w-3.5 h-3.5" aria-hidden />
+            {t.chatUi.send}
           </button>
         )}
       </div>
-      <div className="text-[10px] text-neutral-600 mt-1.5 px-1 flex items-center gap-2">
+      <div className="text-[10px] text-neutral-600 mt-1.5 px-1 flex items-center gap-2" aria-hidden>
         <span className={`w-1.5 h-1.5 rounded-full ${sessionLive ? "bg-emerald-500" : "bg-amber-500"}`} />
-        {sessionLive ? "session live · same brain as VS Code" : "new session on send"}
-        <span className="ml-auto">Enter to send · Shift+Enter for newline</span>
+        {sessionLive ? t.chatUi.sessionLive : t.chatUi.newSessionOnSend}
+        <span className="ml-auto">{t.chatUi.sendHintBar}</span>
       </div>
     </div>
   );

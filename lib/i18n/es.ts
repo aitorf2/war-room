@@ -218,4 +218,107 @@ export const t = {
     restrictions: "Restricciones",
     decisions: "Decisiones",
   },
+
+  // ── Cabecera del canal ──
+  header: {
+    files: "Archivos adjuntos",
+    pinned: "Mensajes fijados",
+    notifications: "Notificaciones",
+    members: "Miembros",
+    searchChannels: "Buscar en el canal",
+    openInEditor: (name: string) => `Abrir proyecto en ${name}`,
+    openInEditorFailed: "No se pudo abrir el editor",
+    privateChannel: "privado",
+
+    // Chip del agente
+    agentChipPinned: (name: string) => `Agente principal: ${name} · Menciona otro agente en el chat para usarlo puntualmente`,
+    agentChipDefault: (name: string) => `Sin agente principal · usando valor global (${name}) · menciona cualquier agente para cambiarlo en este turno`,
+    agentChipOpen: "Opciones del agente",
+    agentChipConfigured: "Configurado",
+    agentChipNotConfigured: "Sin configurar",
+
+    // Popover — agente principal
+    primaryAI: "Agente principal del canal",
+    useGlobalDefault: "Usar valor global",
+    cliBridge: "Puente CLI",
+    apiDirect: "API directa",
+    mentionHandles: "Menciones disponibles",
+    mentionHint: "Tachado = sin configurar. Activa el contexto compartido para que los agentes vean las respuestas de otros.",
+    primaryHint: "El principal responde todos los mensajes de este canal. Los demás se activan con @mención para un solo turno. Los agentes sin configurar (punto gris) fallarán hasta que los actives en Configuración → Agente.",
+
+    // Popover — contexto cruzado
+    crossAgentContext: "Contexto cruzado entre agentes",
+    contextIsolated: "Aislado",
+    contextShared: "Compartido",
+    contextIsolatedHint: "Cada agente solo ve sus propias respuestas anteriores (por defecto).",
+    contextSharedHint: "Todos los agentes reciben el hilo reciente del canal como contexto, con atribución por",
+    contextMaxMessages: "Máximo de mensajes",
+    contextMaxChars: "Máximo de caracteres",
+
+    // Popover — framework
+    agentFramework: "Framework del agente",
+    frameworkInherit: (name: string) => `Heredar valor global${name ? ` (${name})` : " (ninguno)"}`,
+    frameworkNone: "Ninguno, comportamiento del modelo base",
+    frameworkHint: "Framework que se antepone a cada mensaje del canal como instrucción de sistema.",
+    frameworkSelectLabel: "Seleccionar framework del agente",
+
+    // Popover — primer
+    warRoomPrimer: "Indicador de War Room",
+    primerInherit: (on: boolean) => `Heredar valor global (${on ? "activado" : "desactivado"})`,
+    primerOn: "Activado - el agente aprende el modelo de War Room",
+    primerOff: "Desactivado - agente en bruto, sin contexto de War Room",
+    primerSelectLabel: "Seleccionar modo del indicador",
+    primerOnDesc: "activado",
+    primerOffDesc: "desactivado",
+    primerHintOn: "Activo en este canal. Cuando está activo, el agente puede registrar decisiones, publicar anuncios y añadir entradas de conocimiento.",
+    primerHintOff: "Inactivo en este canal.",
+    primerMissing: "Archivo de indicador no incluido en esta versión. Coloca uno en presets/agent-primer/war-room.md.",
+
+    // Popover — sub-agente
+    claudeSubAgent: "Sub-agente de Claude",
+    subAgentClaudePicks: "Claude elige el agente",
+    subAgentSelectLabel: "Seleccionar sub-agente de Claude",
+    subAgentHint: "Obliga a que cada mensaje de este canal use el agente seleccionado mediante --agent. Déjalo vacío para que Claude elija según la tarea.",
+
+    // Popover — supervisor
+    supervisorSection: "Supervisor",
+    supervisorDisabled: "Desactivado",
+    supervisorSelectLabel: "Seleccionar agente supervisor",
+    supervisorEveryNLabel: "Cada N mensajes",
+    supervisorActiveHint: (agent: string, n: number) => `${agent} lee los últimos 20 mensajes cada ${n} turnos e inyecta una nota breve de mejora.`,
+    supervisorInactiveHint: "Elige un agente para activar la supervisión en tiempo real de este canal.",
+
+    // Modal de cambio de framework
+    frameworkSwitchTitle: "¿Cambiar el framework a mitad de la conversación?",
+    frameworkSwitchBody: (from: string, to: string) => `Estás cambiando el framework de agente de ${from} a ${to}. El próximo turno del agente usará el nuevo framework. El contexto existente en este canal se mantiene tal cual. Los agentes CLI con memoria de sesión propia no releerán los turnos anteriores bajo las nuevas reglas.`,
+    frameworkSwitchConfirm: "Cambiar framework",
+    frameworkSwitchCancel: "Cancelar",
+    frameworkInheritLabel: "Heredar valor global",
+    frameworkNoneLabel: "Ninguno, comportamiento base",
+
+    // Mensajes fijados
+    pinnedTitle: "Mensajes fijados",
+    pinnedEmpty: "Nada fijado aún. Pasa el cursor sobre cualquier mensaje y haz clic en el pin para guardarlo aquí.",
+    pinnedUnpin: "Desfijar",
+    pinnedYou: "tú",
+    pinnedLoading: "Cargando...",
+  },
+
+  // ── Chat ──
+  chatUi: {
+    welcomeTitle: (channel: string) => `Bienvenido a #${channel}.`,
+    welcomeStart: "Este es el inicio del canal",
+    newSessionOnSend: "nueva sesión al enviar",
+    sessionLive: "sesión activa · mismo contexto que VS Code",
+    sendHintBar: "Intro para enviar · Mayús+Intro para nueva línea",
+    stop: "Detener",
+    send: "Enviar",
+    slashCommands: "Comandos de barra",
+    agentSupervisorNote: (agent: string) => `${agent} · nota del supervisor`,
+    frameworkMissing: (id: string) => `Framework "${id}" no encontrado en presets/frameworks/. Este turno se ejecuta sin framework. Elige otro en el chip de IA.`,
+    firstChatHint: (suggestion: string) => `¿Primera vez aquí? Prueba: ${suggestion}`,
+    firstChatUse: "Usar esto",
+    pinMessage: "Fijar mensaje",
+    agentIsUser: "tú",
+  },
 } as const;
