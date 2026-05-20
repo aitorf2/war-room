@@ -94,17 +94,6 @@ function ensureSchema() {
     );
     CREATE INDEX IF NOT EXISTS idx_quality_criteria_channel
       ON quality_criteria(channel_id, active);
-
-    CREATE TABLE IF NOT EXISTS action_flight_log (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      channel_id TEXT NOT NULL,
-      session_id INTEGER,
-      action_type TEXT NOT NULL,
-      detail TEXT,
-      created_at INTEGER NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_flight_log_channel
-      ON action_flight_log(channel_id, created_at DESC);
   `);
   _schemaReady = true;
 }
@@ -251,7 +240,7 @@ export function recordAutonomousTurn(channelId: string, prompt: string): void {
   ensureSchema();
   db()
     .prepare(
-      `INSERT INTO action_flight_log(channel_id, action_type, detail, created_at)
+      `INSERT INTO action_flight_log(channel_id, action_type, description, created_at)
        VALUES(?, ?, ?, ?)`,
     )
     .run(channelId, "autonomous_trigger", prompt.slice(0, 300), Date.now());
@@ -391,7 +380,7 @@ export function checkQualityCriteria(
 function _recordAndon(channelId: string, failedCriterion: string) {
   db()
     .prepare(
-      `INSERT INTO action_flight_log(channel_id, action_type, detail, created_at)
+      `INSERT INTO action_flight_log(channel_id, action_type, description, created_at)
        VALUES(?, ?, ?, ?)`,
     )
     .run(channelId, "andon_pulled", failedCriterion, Date.now());

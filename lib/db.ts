@@ -426,12 +426,13 @@ export function migrate(d: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_quarantine_channel ON decision_quarantine(channel_id, resolved_at);
     CREATE INDEX IF NOT EXISTS idx_quarantine_expiry ON decision_quarantine(expires_at) WHERE resolved_at IS NULL;
 
-    -- Quality criteria for andon cord (agent self-stop)
+    -- Quality criteria for andon cord (agent self-stop).
+    -- criterion stores the rule: "must_contain:keyword" or "must_not_contain:keyword"
+    -- or "precondition:description" for advance-condition contracts.
     CREATE TABLE IF NOT EXISTS quality_criteria (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       channel_id TEXT NOT NULL,
-      criterion_description TEXT NOT NULL,
-      threshold REAL NOT NULL DEFAULT 0.8,
+      criterion TEXT NOT NULL,
       active INTEGER NOT NULL DEFAULT 1,
       created_at INTEGER NOT NULL
     );
@@ -529,16 +530,18 @@ export function migrate(d: Database.Database) {
     );
     CREATE INDEX IF NOT EXISTS idx_phases_channel ON channel_phases(channel_id, start_at DESC);
 
-    -- Context graph: decisions as nodes, not transcript
+    -- Context graph: directed edge graph of concept relationships within a channel.
+    -- Used by lib/context-graph.ts to surface decision context for VoiceOver.
     CREATE TABLE IF NOT EXISTS context_graph (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       channel_id TEXT NOT NULL,
-      node_type TEXT NOT NULL,
-      content TEXT NOT NULL,
-      parent_id INTEGER REFERENCES context_graph(id),
+      from_node TEXT NOT NULL,
+      to_node TEXT NOT NULL,
+      relation_type TEXT NOT NULL,
+      weight REAL NOT NULL DEFAULT 1.0,
       created_at INTEGER NOT NULL
     );
-    CREATE INDEX IF NOT EXISTS idx_ctxgraph_channel ON context_graph(channel_id, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_ctxgraph_channel ON context_graph(channel_id, weight DESC);
 
     -- Two-layer memory: hot (recent) + cold (architectural decisions)
     CREATE TABLE IF NOT EXISTS memory_cold (
@@ -663,6 +666,10 @@ export function migrate(d: Database.Database) {
   // = render the existing letter glyph + color fallback. Any value
   // takes precedence over icon + color in the avatar renderers.
   migrateAddColumn(d, "user_servers", "icon_url", "TEXT");
+
+  // action_flight_log: older DBs used triggered_at; new schema uses created_at.
+  // Add created_at with DEFAULT 0 so existing rows keep triggered_at as is.
+  migrateAddColumn(d, "action_flight_log", "created_at", "INTEGER NOT NULL DEFAULT 0");
 
   // Channel autonomy perimeter and session limits
   migrateAddColumn(d, "channel_overrides", "autonomy_perimeter_json", "TEXT");
