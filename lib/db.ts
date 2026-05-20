@@ -318,6 +318,239 @@ export function migrate(d: Database.Database) {
       created_at INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_activity_created ON activity(created_at DESC);
+
+    -- Typed event bus: agents emit events, War Room dispatches to macOS
+    CREATE TABLE IF NOT EXISTS channel_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      payload_json TEXT,
+      emitted_at INTEGER NOT NULL,
+      consumed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_events_channel ON channel_events(channel_id, emitted_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_events_unconsumed ON channel_events(consumed_at) WHERE consumed_at IS NULL;
+
+    -- Velocity tracking per channel for rate-of-change alerts
+    CREATE TABLE IF NOT EXISTS channel_velocity (
+      channel_id TEXT PRIMARY KEY,
+      status_code INTEGER NOT NULL DEFAULT 0,
+      tasks_last_7d INTEGER NOT NULL DEFAULT 0,
+      tasks_prev_7d INTEGER NOT NULL DEFAULT 0,
+      last_computed_at INTEGER NOT NULL
+    );
+
+    -- Session testament: structured closeout written at session end
+    CREATE TABLE IF NOT EXISTS session_testaments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      session_id INTEGER REFERENCES claude_sessions(id),
+      commitments_json TEXT,
+      decisions_json TEXT,
+      next_steps_json TEXT,
+      open_questions_json TEXT,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_testament_channel ON session_testaments(channel_id, created_at DESC);
+
+    -- Immutable agreements: always injected before recent context
+    CREATE TABLE IF NOT EXISTS channel_agreements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      is_immutable INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      created_by TEXT NOT NULL DEFAULT 'user'
+    );
+    CREATE INDEX IF NOT EXISTS idx_agreements_channel ON channel_agreements(channel_id, created_at);
+
+    -- Work frontier: agent's position in the task space (dead reckoning)
+    CREATE TABLE IF NOT EXISTS work_frontier (
+      channel_id TEXT PRIMARY KEY,
+      frontier_json TEXT NOT NULL,
+      last_commit_sha TEXT,
+      last_file_touched TEXT,
+      deduced_at INTEGER NOT NULL
+    );
+
+    -- Friction log: historical sticking points loaded before content
+    CREATE TABLE IF NOT EXISTS friction_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      description TEXT NOT NULL,
+      frequency INTEGER NOT NULL DEFAULT 1,
+      last_seen_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_friction_channel ON friction_log(channel_id, frequency DESC);
+
+    -- Autonomy policy: what agent can/cannot do per channel
+    CREATE TABLE IF NOT EXISTS autonomy_policy (
+      channel_id TEXT PRIMARY KEY,
+      can_do_json TEXT NOT NULL DEFAULT '[]',
+      cannot_do_json TEXT NOT NULL DEFAULT '[]',
+      escalate_json TEXT NOT NULL DEFAULT '[]',
+      uncertainty_threshold REAL NOT NULL DEFAULT 0.7,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- Pre-declared contingencies (autonomy earned by planning ahead)
+    CREATE TABLE IF NOT EXISTS autonomy_contingencies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      condition_description TEXT NOT NULL,
+      fallback_action TEXT NOT NULL,
+      approved_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_contingencies_channel ON autonomy_contingencies(channel_id);
+
+    -- Weekly autonomy token budget per channel
+    CREATE TABLE IF NOT EXISTS autonomy_budget (
+      channel_id TEXT PRIMARY KEY,
+      week_token_budget INTEGER NOT NULL DEFAULT 50000,
+      week_token_used INTEGER NOT NULL DEFAULT 0,
+      week_start_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    -- Decision quarantine: agent's questions expire and default applies
+    CREATE TABLE IF NOT EXISTS decision_quarantine (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      question TEXT NOT NULL,
+      default_answer TEXT NOT NULL,
+      expires_at INTEGER NOT NULL,
+      resolved_at INTEGER,
+      resolution TEXT,
+      applied_default INTEGER NOT NULL DEFAULT 0
+    );
+    CREATE INDEX IF NOT EXISTS idx_quarantine_channel ON decision_quarantine(channel_id, resolved_at);
+    CREATE INDEX IF NOT EXISTS idx_quarantine_expiry ON decision_quarantine(expires_at) WHERE resolved_at IS NULL;
+
+    -- Quality criteria for andon cord (agent self-stop)
+    CREATE TABLE IF NOT EXISTS quality_criteria (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      criterion_description TEXT NOT NULL,
+      threshold REAL NOT NULL DEFAULT 0.8,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_criteria_channel ON quality_criteria(channel_id, active);
+
+    -- Flight data recorder: every agent action logged for VoiceOver playback
+    CREATE TABLE IF NOT EXISTS action_flight_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      session_id INTEGER REFERENCES claude_sessions(id),
+      action_type TEXT NOT NULL,
+      description TEXT NOT NULL,
+      file_path TEXT,
+      decision_made TEXT,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_flight_channel ON action_flight_log(channel_id, created_at DESC);
+
+    -- Agent metrics: precision streak + lexical entropy for weaning protocol
+    CREATE TABLE IF NOT EXISTS agent_metrics (
+      channel_id TEXT PRIMARY KEY,
+      precision_streak INTEGER NOT NULL DEFAULT 0,
+      total_tasks_completed INTEGER NOT NULL DEFAULT 0,
+      mean_lexical_entropy REAL,
+      autonomy_level INTEGER NOT NULL DEFAULT 1,
+      last_updated INTEGER NOT NULL
+    );
+
+    -- Channel lifecycle: objective + acceptance criteria + closure
+    CREATE TABLE IF NOT EXISTS channel_lifecycle (
+      channel_id TEXT PRIMARY KEY,
+      objective TEXT,
+      acceptance_criteria_json TEXT,
+      progress_pct REAL NOT NULL DEFAULT 0,
+      weekly_setpoint INTEGER,
+      tasks_this_week INTEGER NOT NULL DEFAULT 0,
+      opened_at INTEGER,
+      closed_at INTEGER
+    );
+
+    -- Deferred intent queue: user dictates, agent executes when idle
+    CREATE TABLE IF NOT EXISTS deferred_intents (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      instruction TEXT NOT NULL,
+      submitted_at INTEGER NOT NULL,
+      execute_after INTEGER,
+      executed_at INTEGER,
+      result_summary TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_intents_pending ON deferred_intents(channel_id, executed_at) WHERE executed_at IS NULL;
+
+    -- Incident channels: temporary cross-project coordination
+    CREATE TABLE IF NOT EXISTS incident_channels (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_ids_json TEXT NOT NULL,
+      description TEXT NOT NULL,
+      opened_at INTEGER NOT NULL,
+      closed_at INTEGER,
+      summary TEXT
+    );
+
+    -- Inverse telemetry: agent proactively reports confidence
+    CREATE TABLE IF NOT EXISTS agent_telemetry (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      confidence REAL NOT NULL,
+      unverified_assumption_count INTEGER NOT NULL DEFAULT 0,
+      time_to_next_decision_secs INTEGER,
+      current_mode TEXT,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_telemetry_channel ON agent_telemetry(channel_id, created_at DESC);
+
+    -- Drill runs: dry-run mode for rehearsing autonomy
+    CREATE TABLE IF NOT EXISTS drill_runs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      task_description TEXT NOT NULL,
+      result_log_json TEXT,
+      intervention_points_json TEXT,
+      created_at INTEGER NOT NULL,
+      completed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_drills_channel ON drill_runs(channel_id, created_at DESC);
+
+    -- Work phases: autonomy frequency adjusted per project phase
+    CREATE TABLE IF NOT EXISTS channel_phases (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      phase_name TEXT NOT NULL,
+      autonomy_freq_secs INTEGER NOT NULL DEFAULT 3600,
+      start_at INTEGER NOT NULL,
+      end_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_phases_channel ON channel_phases(channel_id, start_at DESC);
+
+    -- Context graph: decisions as nodes, not transcript
+    CREATE TABLE IF NOT EXISTS context_graph (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      node_type TEXT NOT NULL,
+      content TEXT NOT NULL,
+      parent_id INTEGER REFERENCES context_graph(id),
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_ctxgraph_channel ON context_graph(channel_id, created_at DESC);
+
+    -- Two-layer memory: hot (recent) + cold (architectural decisions)
+    CREATE TABLE IF NOT EXISTS memory_cold (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      tags_json TEXT,
+      importance INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      last_accessed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS idx_memory_cold_channel ON memory_cold(channel_id, importance DESC);
   `);
 
   migrateClaudeSessionsAdapterId(d);
@@ -377,6 +610,14 @@ export function migrate(d: Database.Database) {
   // = render the existing letter glyph + color fallback. Any value
   // takes precedence over icon + color in the avatar renderers.
   migrateAddColumn(d, "user_servers", "icon_url", "TEXT");
+
+  // Channel autonomy perimeter and session limits
+  migrateAddColumn(d, "channel_overrides", "autonomy_perimeter_json", "TEXT");
+  migrateAddColumn(d, "channel_overrides", "max_session_secs", "INTEGER");
+  migrateAddColumn(d, "channel_overrides", "active_slot_at", "INTEGER");
+  migrateAddColumn(d, "channel_overrides", "poka_yoke_enabled", "INTEGER NOT NULL DEFAULT 1");
+  migrateAddColumn(d, "channel_overrides", "auto_inject_testament", "INTEGER NOT NULL DEFAULT 1");
+  migrateAddColumn(d, "channel_overrides", "dead_reckoning_enabled", "INTEGER NOT NULL DEFAULT 0");
 
   seedDefaultServers(d);
 
