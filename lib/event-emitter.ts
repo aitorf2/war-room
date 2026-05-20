@@ -13,7 +13,10 @@ export type ChannelEventType =
   | "intent_executed"
   | "budget_exhausted"
   | "phase_changed"
-  | "state_review_triggered";
+  | "state_review_triggered"
+  | "velocity_alert"
+  | "incident_opened"
+  | "incident_resolved";
 
 function ensureChannelEventsTable() {
   db().exec(`

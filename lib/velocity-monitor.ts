@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { emitChannelEvent } from "./event-emitter";
-import { playChannelSound, type SoundIndex } from "./notifications";
+import { playChannelSound, type ChannelStatus } from "./notifications";
 
 export type VelocityStatus = "rising" | "stable" | "falling" | "stalled";
 
@@ -135,7 +135,7 @@ export function getVelocityText(channelId: string): string {
 }
 
 export function playVelocitySound(status: VelocityStatus): void {
-  const soundMap: Record<VelocityStatus, SoundIndex> = {
+  const soundMap: Record<VelocityStatus, ChannelStatus> = {
     rising: 1,
     stable: 0,
     falling: 2,
