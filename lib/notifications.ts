@@ -79,3 +79,20 @@ export function dispatchEvent(
   const title = `${channelName} ${suffix}`.trim();
   sendMacNotification(title, detail ?? "");
 }
+
+export function notifyAndonPulled(channelId: string, reason: string): void {
+  dispatchEvent("andon_pulled", channelId, reason);
+}
+
+export function notifyBudgetExhausted(
+  channelId: string,
+  tokensUsed: number,
+  elapsedSecs: number,
+): void {
+  const mins = Math.round(elapsedSecs / 60);
+  dispatchEvent(
+    "agent_completed",
+    channelId,
+    `Presupuesto agotado: ${tokensUsed} tokens, ${mins} minutos`,
+  );
+}

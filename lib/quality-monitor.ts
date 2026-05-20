@@ -163,7 +163,7 @@ export function updateAgentMetrics(
 
   // Lexical degradation: pull the andon cord so the user is alerted.
   if (newMean < 0.3) {
-    emitChannelEvent(channelId, channelId, "andon_pulled", {
+    emitChannelEvent(channelId, "andon_pulled", {
       detail: `Entropia lexica media caida a ${newMean.toFixed(2)}. El agente puede estar repitiendo patrones.`,
     });
   }
