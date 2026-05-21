@@ -36,13 +36,13 @@ type Widget = {
 
 // Sidebar widgets scroll the dashboard to that section. Order matches dashboard layout.
 const WIDGETS: Widget[] = [
-  { id: "home", label: "Home", Icon: HomeIcon, accent: "text-amber-300" },
-  { id: "active-jobs", label: "Active jobs", Icon: Briefcase, accent: "text-emerald-300" },
-  { id: "boardroom", label: "Boardroom", Icon: Users, accent: "text-violet-300" },
-  { id: "activity", label: "Activity chart", Icon: TrendingUp, accent: "text-violet-300" },
-  { id: "recent-activity", label: "Recent activity", Icon: ActivityIcon, accent: "text-sky-300" },
-  { id: "recent-files", label: "Recent files", Icon: FileText, accent: "text-neutral-300" },
-  { id: "agent-flow", label: "Agent flow", Icon: Bot, accent: "text-amber-300" },
+  { id: "home", label: "Inicio", Icon: HomeIcon, accent: "text-amber-300" },
+  { id: "active-jobs", label: "Proyectos activos", Icon: Briefcase, accent: "text-emerald-300" },
+  { id: "boardroom", label: "Sala de reuniones", Icon: Users, accent: "text-violet-300" },
+  { id: "activity", label: "Gráfico de actividad", Icon: TrendingUp, accent: "text-violet-300" },
+  { id: "recent-activity", label: "Actividad reciente", Icon: ActivityIcon, accent: "text-sky-300" },
+  { id: "recent-files", label: "Archivos recientes", Icon: FileText, accent: "text-neutral-300" },
+  { id: "agent-flow", label: "Flujo de agentes", Icon: Bot, accent: "text-amber-300" },
 ];
 
 export function DashboardWidgets() {
@@ -58,7 +58,7 @@ export function DashboardWidgets() {
       >
         {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         <LayoutDashboard className="w-3 h-3 text-neutral-600" />
-        <span>Dashboard</span>
+        <span>Panel</span>
         <span className="ml-auto text-neutral-700">{WIDGETS.length}</span>
       </button>
       {!collapsed && (

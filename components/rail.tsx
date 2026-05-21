@@ -174,8 +174,7 @@ function ServerIcon({
         e.preventDefault();
         onEdit();
       }}
-      title={t.rail.editServer.serverIconTitle(server.name)}
-      aria-label={server.name}
+      aria-label={`${server.name} — clic derecho para editar`}
       {...ariaCurrent(active)}
       className="relative group"
     >
