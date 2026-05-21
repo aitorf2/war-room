@@ -85,7 +85,7 @@ export function FilesPanel({
   };
 
   const remove = async (id: number, name: string) => {
-    if (!confirm(`Delete "${name}"?`)) return;
+    if (!confirm(`¿Eliminar "${name}"?`)) return;
     setItems((cur) => (cur ? cur.filter((f) => f.id !== id) : cur));
     await fetch("/api/files", {
       method: "DELETE",
@@ -118,10 +118,10 @@ export function FilesPanel({
         <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
           <div>
             <h2 className="text-lg font-semibold">
-              Files in #{channelName}
+              Archivos en #{channelName}
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Storage: {backend} · 100MB cap per file
+              Almacenamiento: {backend} · límite 100 MB por archivo
             </p>
           </div>
           <button
@@ -145,10 +145,10 @@ export function FilesPanel({
             <div className="text-center py-16 px-4">
               <Upload className="w-10 h-10 text-neutral-700 mx-auto mb-3" />
               <div className="text-sm text-neutral-400 mb-1">
-                Drop files here or click upload
+                Suelta archivos aquí o haz clic en subir
               </div>
               <div className="text-xs text-neutral-600">
-                Briefs, references, deliverables, raw client material
+                Briefings, referencias, entregables, material del cliente
               </div>
             </div>
           ) : (
@@ -181,10 +181,10 @@ export function FilesPanel({
             className="flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/25 disabled:opacity-50"
           >
             <Upload className="w-4 h-4" />
-            {uploading ? "Uploading…" : "Upload files"}
+            {uploading ? "Subiendo…" : "Subir archivos"}
           </button>
           <span className="ml-auto text-[10px] text-neutral-600 uppercase tracking-wider">
-            or drag and drop anywhere in this panel
+            o arrastra y suelta en cualquier parte de este panel
           </span>
         </div>
       </div>
@@ -226,16 +226,16 @@ function FileRow({
         href={`/api/files/${file.id}`}
         download={file.original_name}
         className="opacity-0 group-hover:opacity-100 p-1.5 text-neutral-400 hover:text-emerald-300 hover:bg-neutral-900 rounded"
-        title="Download"
+        aria-label="Descargar"
       >
-        <Download className="w-3.5 h-3.5" />
+        <Download aria-hidden="true" className="w-3.5 h-3.5" />
       </a>
       <button
         onClick={onDelete}
         className="opacity-0 group-hover:opacity-100 p-1.5 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded"
-        title="Delete"
+        aria-label="Eliminar"
       >
-        <Trash2 className="w-3.5 h-3.5" />
+        <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />
       </button>
     </div>
   );

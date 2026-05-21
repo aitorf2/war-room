@@ -70,9 +70,9 @@ export function NewJobDialog({
           <div className="flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-emerald-400" />
             <div>
-              <h2 className="text-lg font-semibold">New job</h2>
+              <h2 className="text-lg font-semibold">Nuevo encargo</h2>
               <p className="text-xs text-neutral-500 mt-0.5">
-                Creates a personal channel for each assignee
+                Crea un canal personal para cada asignado
               </p>
             </div>
           </div>
@@ -85,36 +85,36 @@ export function NewJobDialog({
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           <div>
-            <Label>Title</Label>
+            <Label>Título</Label>
             <input
               autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What's the job?"
+              placeholder="¿En qué consiste el encargo?"
               className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700"
             />
           </div>
           <div>
-            <Label>Client (optional)</Label>
+            <Label>Cliente (opcional)</Label>
             <input
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              placeholder="Client name"
+              placeholder="Nombre del cliente"
               className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700"
             />
           </div>
           <div>
-            <Label>Description (optional)</Label>
+            <Label>Descripción (opcional)</Label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="The brief, the why, links to references…"
+              placeholder="El encargo, el porqué, enlaces de referencia…"
               rows={4}
               className="w-full bg-neutral-900 border border-neutral-800 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-neutral-700 resize-none"
             />
           </div>
           <div>
-            <Label>Assignees</Label>
+            <Label>Asignados</Label>
             <div className="flex flex-wrap gap-2">
               {TEAM.map((m) => {
                 const selected = assignees.includes(m.id);
@@ -141,13 +141,15 @@ export function NewJobDialog({
               })}
             </div>
             <div className="text-[10px] text-neutral-600 mt-1.5">
-              Each assignee gets a channel under their personal Active projects.
+              Cada asignado recibe un canal en sus proyectos activos personales.
             </div>
           </div>
           <div>
-            <Label>Status</Label>
+            <Label>Estado</Label>
             <div className="flex gap-2">
-              {(["active", "recurring", "finished"] as const).map((s) => (
+              {(["active", "recurring", "finished"] as const).map((s) => {
+                const statusLabel: Record<string, string> = { active: "activo", recurring: "recurrente", finished: "finalizado" };
+                return (
                 <button
                   key={s}
                   onClick={() => setStatus(s)}
@@ -157,9 +159,10 @@ export function NewJobDialog({
                       : "border-neutral-800 bg-neutral-900 text-neutral-400 hover:border-neutral-700"
                   }`}
                 >
-                  {s}
+                  {statusLabel[s] ?? s}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
           {error && (
@@ -173,14 +176,14 @@ export function NewJobDialog({
             onClick={onClose}
             className="px-3 py-2 text-sm rounded-md border border-neutral-800 hover:bg-neutral-900"
           >
-            Cancel
+            Cancelar
           </button>
           <button
             disabled={!title.trim() || assignees.length === 0 || saving}
             onClick={submit}
             className="px-4 py-2 text-sm rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/30 disabled:opacity-40"
           >
-            {saving ? "Creating…" : "Create job"}
+            {saving ? "Creando…" : "Crear encargo"}
           </button>
         </div>
       </div>

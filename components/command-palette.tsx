@@ -253,6 +253,43 @@ export function CommandPalette() {
     el?.scrollIntoView({ block: "nearest" });
   }, [cursor]);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Focus trap: Tab cycles only within the dialog while it is open.
+  useEffect(() => {
+    if (!open || !dialogRef.current) return;
+    const dialog = dialogRef.current;
+    const focusable = () =>
+      Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input,textarea,select,[tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => !el.closest("[aria-hidden]"));
+
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const els = focusable();
+      if (!els.length) return;
+      const first = els[0];
+      const last = els[els.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    dialog.addEventListener("keydown", onTab);
+    return () => dialog.removeEventListener("keydown", onTab);
+  }, [open]);
+
+  const activeItemId = filtered[cursor] ? `cp-option-${cursor}` : undefined;
+
   if (!open) return null;
 
   return (
@@ -261,11 +298,15 @@ export function CommandPalette() {
       onClick={() => setOpen(false)}
     >
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Paleta de comandos"
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-2xl bg-[#0d0d0f] border border-neutral-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[70vh]"
       >
         <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-800">
-          <Search className="w-4 h-4 text-neutral-500 shrink-0" />
+          <Search className="w-4 h-4 text-neutral-500 shrink-0" aria-hidden />
           <input
             ref={inputRef}
             value={query}
@@ -275,6 +316,12 @@ export function CommandPalette() {
             }}
             onKeyDown={onKey}
             placeholder={t.commandPalette.searchPlaceholder}
+            aria-label="Buscar canales y acciones"
+            aria-controls="cp-listbox"
+            aria-activedescendant={activeItemId}
+            aria-autocomplete="list"
+            role="combobox"
+            aria-expanded={filtered.length > 0}
             className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-neutral-600"
           />
           <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-500 font-mono">
@@ -282,7 +329,13 @@ export function CommandPalette() {
           </kbd>
         </div>
 
-        <div ref={listRef} className="overflow-y-auto flex-1 py-2">
+        <div
+          ref={listRef}
+          id="cp-listbox"
+          role="listbox"
+          aria-label="Resultados"
+          className="overflow-y-auto flex-1 py-2"
+        >
           {!data ? (
             <div className="px-4 py-8 text-center text-xs text-neutral-600">{t.commandPalette.loading}</div>
           ) : filtered.length === 0 ? (
@@ -378,7 +431,10 @@ function Row({
 }) {
   return (
     <button
+      id={`cp-option-${idx}`}
       data-idx={idx}
+      role="option"
+      aria-selected={active}
       onMouseEnter={onMouseEnter}
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-2 text-left ${

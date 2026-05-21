@@ -135,11 +135,11 @@ function TabButton({
 function GeneralTab({ onClose }: { onClose: () => void }) {
   return (
     <div className="space-y-6">
-      <Section title="Your profile" description="Display name + avatar image. Used everywhere your name shows up (chat bubbles, boardroom seat, right sidebar Humans row).">
+      <Section title="Tu perfil" description="Nombre mostrado + imagen de avatar. Se usa en todo el sistema: burbujas de chat, asiento en la sala de reuniones, panel lateral.">
         <ProfileEditorRow />
       </Section>
 
-      <Section title="Setup" description="Re-run the welcome flow to update your identity, Claude CLI path, or workspace root.">
+      <Section title="Configuración inicial" description="Vuelve a ejecutar el asistente de bienvenida para actualizar tu identidad, la ruta del CLI de Claude o la carpeta de proyectos.">
         <button
           onClick={() => {
             window.dispatchEvent(new CustomEvent("war-room:open-onboarding"));
@@ -147,12 +147,12 @@ function GeneralTab({ onClose }: { onClose: () => void }) {
           }}
           className="flex items-center gap-2 px-4 py-2 text-sm rounded-md border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-200"
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-          Re-run setup wizard
+          <Sparkles aria-hidden="true" className="w-3.5 h-3.5 text-amber-300" />
+          Volver a ejecutar el asistente
         </button>
       </Section>
 
-      <Section title="Onboarding state" description="Stored locally in ~/.war-room/app.db. Use the wizard to update.">
+      <Section title="Estado del asistente" description="Almacenado localmente en ~/.war-room/app.db. Usa el asistente para actualizar.">
         <OnboardingSummary />
       </Section>
     </div>
@@ -206,17 +206,17 @@ function ProfileEditorRow() {
       )}
       <div className="flex-1 min-w-0 space-y-2">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Display name</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Nombre mostrado</div>
           <input
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             disabled={!loaded}
-            placeholder="Your name"
+            placeholder="Tu nombre"
             className="w-full bg-neutral-950 border border-neutral-800 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-neutral-700"
           />
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Avatar image</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-1">Imagen de avatar</div>
           <div className="flex items-center gap-2">
             <input
               value={iconUrl}
@@ -231,14 +231,14 @@ function ProfileEditorRow() {
                 onClick={() => setIconUrl("")}
                 disabled={!loaded}
                 className="text-[11px] text-neutral-500 hover:text-red-300"
-                title="Clear image"
+                title="Borrar imagen"
               >
-                clear
+                borrar
               </button>
             )}
           </div>
           <div className="text-[10px] text-neutral-600 mt-1">
-            Paste any image URL or upload from your computer. Falls back to a letter avatar when blank.
+            Pega cualquier URL de imagen o sube desde tu ordenador. Si está en blanco se usa la inicial del nombre.
           </div>
         </div>
         <div className="flex justify-end">
@@ -263,13 +263,13 @@ function OnboardingSummary() {
       .then((d) => setData(d.settings))
       .catch(() => {});
   }, []);
-  if (!data) return <div className="text-xs text-neutral-600">Loading…</div>;
+  if (!data) return <div className="text-xs text-neutral-600">Cargando…</div>;
   return (
     <dl className="text-xs grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 font-mono">
-      <KV k="Identity" v={data["onboarding.identity"]} />
-      <KV k="Display name" v={data["onboarding.displayName"]} />
+      <KV k="Identidad" v={data["onboarding.identity"]} />
+      <KV k="Nombre mostrado" v={data["onboarding.displayName"]} />
       <KV
-        k="Agent label"
+        k="Nombre del agente"
         v={
           data["onboarding.agentName"] ||
           (data["onboarding.displayName"]
@@ -278,8 +278,8 @@ function OnboardingSummary() {
         }
       />
       <KV k="Claude CLI" v={data["onboarding.claudeBin"]} />
-      <KV k="Projects folder" v={data["onboarding.workspaceRoot"]} />
-      <KV k="Sync opt-in" v={data["onboarding.syncOptIn"] === "1" ? "yes" : "no"} />
+      <KV k="Carpeta de proyectos" v={data["onboarding.workspaceRoot"]} />
+      <KV k="Sincronización" v={data["onboarding.syncOptIn"] === "1" ? "sí" : "no"} />
     </dl>
   );
 }
@@ -288,7 +288,7 @@ function KV({ k, v }: { k: string; v: string | null | undefined }) {
   return (
     <>
       <dt className="text-neutral-500">{k}</dt>
-      <dd className="text-neutral-300 truncate">{v || <span className="text-neutral-600">(unset)</span>}</dd>
+      <dd className="text-neutral-300 truncate">{v || <span className="text-neutral-600">(sin definir)</span>}</dd>
     </>
   );
 }
@@ -331,7 +331,7 @@ function AgentTab() {
       .catch(() => {});
   }, []);
 
-  if (!data) return <div className="text-xs text-neutral-600">Loading…</div>;
+  if (!data) return <div className="text-xs text-neutral-600">Cargando…</div>;
 
   const set = (k: string, v: string) => setDraft((cur) => ({ ...cur, [k]: v }));
 
@@ -388,12 +388,12 @@ function AgentTab() {
         <div className="flex items-center gap-2">
           <span
             className={`w-2 h-2 rounded-full ${a.isConfigured ? "bg-emerald-500" : "bg-neutral-700"}`}
-            title={a.isConfigured ? "Configured" : "Needs setup"}
+            title={a.isConfigured ? "Configurado" : "Requiere configuración"}
           />
           <span className="text-sm font-medium text-neutral-100">{a.name}</span>
           {isActive && (
             <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-200 ml-auto">
-              active
+              activo
             </span>
           )}
         </div>
@@ -416,8 +416,8 @@ function AgentTab() {
     <div className="space-y-6">
       {configuredForProfiles.length > 0 && (
         <Section
-          title="Agent profiles"
-          description="Each wired-up agent shows up across the app (chat bubbles, boardroom seats, sidebar rows) with its built-in name + brand logo + brand color by default. Override any of those per agent here. Click an agent to expand."
+          title="Perfiles de agente"
+          description="Cada agente configurado aparece en toda la app (burbujas de chat, asientos en la sala de reuniones, filas del panel lateral) con su nombre integrado, logo de marca y color de marca por defecto. Modifica cualquiera de ellos por agente aquí. Haz clic en un agente para expandirlo."
         >
           <div className="space-y-2">
             {configuredForProfiles.map((a) => (
@@ -427,9 +427,9 @@ function AgentTab() {
         </Section>
       )}
 
-      <Section title="Backend" description="Choose how War Room talks to an AI. CLI bridge runs the official binary in your project folder (full feature set). API mode hits the provider directly (chat only, no tools, no project files, no memory).">
+      <Section title="Backend" description="Elige cómo War Room se comunica con la IA. El puente CLI ejecuta el binario oficial en tu carpeta de proyecto (funcionalidad completa). El modo API llama al proveedor directamente (solo chat, sin herramientas, sin archivos de proyecto, sin memoria).">
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">CLI bridge, full feature set</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">Puente CLI, funcionalidad completa</div>
           <div className="grid grid-cols-2 gap-2">
             {cliAdapters.map((a) => (
               <Card key={a.id} a={a} />
@@ -437,7 +437,7 @@ function AgentTab() {
           </div>
         </div>
         <div className="mt-4">
-          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">BYOK direct API, chat only</div>
+          <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">API directa BYOK, solo chat</div>
           <div className="grid grid-cols-2 gap-2">
             {apiAdapters.map((a) => (
               <Card key={a.id} a={a} />
@@ -446,7 +446,7 @@ function AgentTab() {
         </div>
       </Section>
 
-      <Section title="CLI bridge, binary paths" description="Override the executable lookup if the binary isn't on your PATH. Leave blank to use the default.">
+      <Section title="Puente CLI, rutas de binarios" description="Reemplaza la búsqueda del ejecutable si el binario no está en tu PATH. Deja en blanco para usar el predeterminado.">
         <KVInput label="claude" value={draft["agent.cli.claude.bin"] ?? ""} onChange={(v) => set("agent.cli.claude.bin", v)} />
         <KVInput label="codex" value={draft["agent.cli.codex.bin"] ?? ""} onChange={(v) => set("agent.cli.codex.bin", v)} />
         <KVInput label="gemini" value={draft["agent.cli.gemini.bin"] ?? ""} onChange={(v) => set("agent.cli.gemini.bin", v)} />
@@ -457,7 +457,7 @@ function AgentTab() {
         <KVInput label="custom args template" value={draft["agent.cli.custom.template"] ?? ""} onChange={(v) => set("agent.cli.custom.template", v)} placeholder='--prompt "{{prompt}}" --cwd "{{cwd}}"' />
       </Section>
 
-      <Section title="API keys (BYOK)" description="Pasted keys are stored in your local SQLite (~/.war-room/app.db). They never leave your machine.">
+      <Section title="Claves API (BYOK)" description="Las claves pegadas se almacenan en tu SQLite local (~/.war-room/app.db). Nunca salen de tu máquina.">
         <ApiPair
           name="Anthropic"
           keyValue={draft["agent.api.anthropic.key"] ?? ""}
@@ -492,7 +492,7 @@ function AgentTab() {
         />
       </Section>
 
-      <Section title="Custom OpenAI-compatible endpoint" description="Anything that speaks the OpenAI Chat Completions protocol. Works with OpenRouter, Groq, Together, Mistral, DeepSeek, Ollama (http://localhost:11434/v1), and most others.">
+      <Section title="Endpoint compatible con OpenAI" description="Cualquier servicio que hable el protocolo OpenAI Chat Completions. Funciona con OpenRouter, Groq, Together, Mistral, DeepSeek, Ollama (http://localhost:11434/v1) y la mayoría de los demás.">
         <KVInput label="base URL" value={draft["agent.api.openai-compat.baseUrl"] ?? ""} onChange={(v) => set("agent.api.openai-compat.baseUrl", v)} placeholder="https://openrouter.ai/api/v1" />
         <KVInput label="api key" value={draft["agent.api.openai-compat.key"] ?? ""} onChange={(v) => set("agent.api.openai-compat.key", v)} secret />
         <KVInput label="model name" value={draft["agent.api.openai-compat.model"] ?? ""} onChange={(v) => set("agent.api.openai-compat.model", v)} placeholder="anthropic/claude-3.5-sonnet" />
@@ -526,12 +526,12 @@ const PRESET_ICONS = [
 ];
 
 const ACCENT_OPTIONS: Array<{ value: string; label: string; swatch: string }> = [
-  { value: "amber", label: "Amber", swatch: "bg-amber-500" },
-  { value: "sky", label: "Sky", swatch: "bg-sky-500" },
-  { value: "emerald", label: "Emerald", swatch: "bg-emerald-500" },
-  { value: "violet", label: "Violet", swatch: "bg-violet-500" },
-  { value: "fuchsia", label: "Fuchsia", swatch: "bg-fuchsia-500" },
-  { value: "rose", label: "Rose", swatch: "bg-rose-500" },
+  { value: "amber", label: "Ámbar", swatch: "bg-amber-500" },
+  { value: "sky", label: "Cielo", swatch: "bg-sky-500" },
+  { value: "emerald", label: "Esmeralda", swatch: "bg-emerald-500" },
+  { value: "violet", label: "Violeta", swatch: "bg-violet-500" },
+  { value: "fuchsia", label: "Fucsia", swatch: "bg-fuchsia-500" },
+  { value: "rose", label: "Rosa", swatch: "bg-rose-500" },
 ];
 
 function ProfileLabel({ children }: { children: React.ReactNode }) {
@@ -637,11 +637,11 @@ function ProfileEditor({
       {open && (
         <div className="border-t border-neutral-800 p-3 space-y-3">
           {!loaded ? (
-            <div className="text-xs text-neutral-600 italic">Loading...</div>
+            <div className="text-xs text-neutral-600 italic">Cargando…</div>
           ) : (
             <>
               <div>
-                <ProfileLabel>Display name</ProfileLabel>
+                <ProfileLabel>Nombre mostrado</ProfileLabel>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -649,7 +649,7 @@ function ProfileEditor({
                   className="w-full bg-neutral-950 border border-neutral-800 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-neutral-700"
                 />
                 <div className="text-[10px] text-neutral-600 mt-1">
-                  Leave blank to use the built-in name.
+                  Deja en blanco para usar el nombre integrado.
                 </div>
               </div>
               <div>
@@ -658,15 +658,15 @@ function ProfileEditor({
                   <button
                     onClick={() => setIconUrl("")}
                     className={`relative w-11 h-11 rounded-full overflow-hidden border-2 bg-neutral-950 ${iconUrl === "" ? "border-amber-400" : "border-neutral-800 hover:border-neutral-700"}`}
-                    title="Built-in"
+                    title="Integrado"
                   >
                     {adapter.defaultIconUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={adapter.defaultIconUrl} alt="" className="w-full h-full object-cover opacity-80" />
                     ) : (
-                      <Bot className="w-4 h-4 text-neutral-500 m-auto" />
+                      <Bot aria-hidden="true" className="w-4 h-4 text-neutral-500 m-auto" />
                     )}
-                    <span className="absolute -bottom-3 left-0 right-0 text-[8px] text-neutral-500 text-center">built-in</span>
+                    <span className="absolute -bottom-3 left-0 right-0 text-[8px] text-neutral-500 text-center">integrado</span>
                   </button>
                   {PRESET_ICONS.map((p) => (
                     <button
@@ -684,21 +684,21 @@ function ProfileEditor({
                   <input
                     value={iconUrl.startsWith("/agent-logos/") ? "" : iconUrl}
                     onChange={(e) => setIconUrl(e.target.value)}
-                    placeholder="Or paste a URL (https://...)"
+                    placeholder="O pega una URL (https://...)"
                     className="flex-1 bg-neutral-950 border border-neutral-800 rounded px-2 py-1.5 text-xs font-mono focus:outline-none focus:border-neutral-700"
                   />
                   <UploadButton onUploaded={(url) => setIconUrl(url)} />
                 </div>
               </div>
               <div>
-                <ProfileLabel>Accent color</ProfileLabel>
+                <ProfileLabel>Color de acento</ProfileLabel>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setAccent("")}
                     className={`px-2 py-1.5 rounded border text-[11px] ${accent === "" ? "border-amber-400 text-amber-200" : "border-neutral-800 text-neutral-400 hover:border-neutral-700"}`}
-                    title="Built-in brand color"
+                    title="Color de marca integrado"
                   >
-                    built-in
+                    integrado
                   </button>
                   {ACCENT_OPTIONS.map((opt) => (
                     <button
@@ -716,7 +716,7 @@ function ProfileEditor({
                   disabled={saving}
                   className="text-[11px] text-neutral-500 hover:text-red-300 disabled:opacity-40"
                 >
-                  Reset to built-in
+                  Restaurar valores integrados
                 </button>
                 <button
                   onClick={save}
@@ -796,13 +796,13 @@ type SidebarAssignment = { role_id: number; member_kind: string; member_id: stri
 type SidebarMember = { kind: "agent" | "human"; id: string; name: string; iconUrl: string | null };
 
 const ROLE_COLOR_OPTIONS: Array<{ value: string; label: string; swatch: string }> = [
-  { value: "amber", label: "Amber", swatch: "bg-amber-500" },
-  { value: "sky", label: "Sky", swatch: "bg-sky-500" },
-  { value: "emerald", label: "Emerald", swatch: "bg-emerald-500" },
-  { value: "violet", label: "Violet", swatch: "bg-violet-500" },
-  { value: "fuchsia", label: "Fuchsia", swatch: "bg-fuchsia-500" },
-  { value: "rose", label: "Rose", swatch: "bg-rose-500" },
-  { value: "neutral", label: "Neutral", swatch: "bg-neutral-500" },
+  { value: "amber", label: "Ámbar", swatch: "bg-amber-500" },
+  { value: "sky", label: "Cielo", swatch: "bg-sky-500" },
+  { value: "emerald", label: "Esmeralda", swatch: "bg-emerald-500" },
+  { value: "violet", label: "Violeta", swatch: "bg-violet-500" },
+  { value: "fuchsia", label: "Fucsia", swatch: "bg-fuchsia-500" },
+  { value: "rose", label: "Rosa", swatch: "bg-rose-500" },
+  { value: "neutral", label: "Neutro", swatch: "bg-neutral-500" },
 ];
 
 function SidebarTab() {
@@ -896,17 +896,17 @@ function SidebarTab() {
     return assignments.find((x) => x.member_kind === kind && x.member_id === id)?.role_id ?? null;
   };
 
-  if (!loaded) return <div className="text-xs text-neutral-600">Loading...</div>;
+  if (!loaded) return <div className="text-xs text-neutral-600">Cargando…</div>;
 
   return (
     <div className="space-y-6">
       <Section
-        title="Roles"
-        description="Discord-style groupings for the right sidebar. Create a role (e.g. 'Copywriting', 'Video', 'Engineering'), then assign agents and humans to it below. Members without a role land in the default 'Members' section."
+        title="Grupos"
+        description="Agrupaciones estilo Discord para el panel lateral. Crea un grupo (p. ej. 'Redacción', 'Vídeo', 'Ingeniería') y asigna agentes y personas abajo. Los miembros sin grupo van a la sección 'Miembros' por defecto."
       >
         <div className="space-y-2">
           {roles.length === 0 && (
-            <div className="text-xs text-neutral-600 italic">No roles yet. Create one below.</div>
+            <div className="text-xs text-neutral-600 italic">Sin grupos aún. Crea uno abajo.</div>
           )}
           {roles.map((r) => (
             <RoleCard
@@ -923,7 +923,7 @@ function SidebarTab() {
             value={newRoleName}
             onChange={(e) => setNewRoleName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && createRole()}
-            placeholder="New role name..."
+            placeholder="Nombre del nuevo grupo..."
             className="flex-1 bg-neutral-950 border border-neutral-800 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-neutral-700"
           />
           <select
@@ -942,14 +942,14 @@ function SidebarTab() {
             disabled={!newRoleName.trim()}
             className="px-3 py-1.5 text-xs rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-200 hover:bg-amber-500/30 disabled:opacity-40"
           >
-            Add role
+            Añadir grupo
           </button>
         </div>
       </Section>
 
       <Section
-        title="Assign members"
-        description="Pick which role each agent + human falls under. 'Unassigned' lands in the default 'Members' section."
+        title="Asignar miembros"
+        description="Elige a qué grupo pertenece cada agente y persona. 'Sin asignar' va a la sección 'Miembros' por defecto."
       >
         <div className="space-y-2">
           {members.map((m) => (
@@ -982,7 +982,7 @@ function SidebarTab() {
                 }
                 className="bg-neutral-950 border border-neutral-800 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-neutral-700"
               >
-                <option value="">Unassigned</option>
+                <option value="">Sin asignar</option>
                 {roles.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
@@ -1057,11 +1057,11 @@ function RoleCard({
       </select>
       <button
         onClick={() => {
-          if (confirm(`Delete role "${role.name}"? Members keep their assignments cleared.`)) onDelete();
+          if (confirm(`¿Eliminar el grupo "${role.name}"? Los miembros quedarán sin asignar.`)) onDelete();
         }}
         className="text-[11px] text-neutral-500 hover:text-red-300"
       >
-        delete
+        eliminar
       </button>
     </div>
   );
@@ -1070,15 +1070,15 @@ function RoleCard({
 function BoardroomTab() {
   return (
     <div className="space-y-6">
-      <Section title="Devices" description="Default camera and microphone for the Boardroom. For now devices are selected on the pre-join screen each time you start a meeting.">
+      <Section title="Dispositivos" description="Cámara y micrófono predeterminados para la sala de reuniones. Por ahora se seleccionan en la pantalla de entrada cada vez que inicias una reunión.">
         <div className="text-xs text-neutral-500 italic">
-          Persistent device defaults, coming soon.
+          Configuración predeterminada de dispositivos, próximamente.
         </div>
       </Section>
-      <Section title="Floating mini" description="The always-on-top bar that appears when you tab away from War Room during a call.">
+      <Section title="Mini flotante" description="La barra siempre visible que aparece cuando cambias de pestaña durante una llamada.">
         <div className="text-xs text-neutral-400">
-          Currently enabled. To hide during a meeting, click the × on the strip itself.
-          Re-opens automatically the next time you tab away.
+          Actualmente activado. Para ocultarlo durante una reunión, haz clic en la × de la propia barra.
+          Se vuelve a abrir automáticamente la próxima vez que cambies de pestaña.
         </div>
       </Section>
     </div>
@@ -1146,16 +1146,16 @@ function SyncTab() {
 
   const stateLabel =
     status?.state === "open"
-      ? `Connected to ${status.url}`
+      ? `Conectado a ${status.url}`
       : status?.state === "connecting"
-        ? `Connecting to ${status.url}…`
+        ? `Conectando a ${status.url}…`
         : status?.state === "closed"
-          ? `Disconnected (will retry)`
+          ? `Desconectado (reintentando)`
           : status?.state === "error"
-            ? `Error: ${status.lastError ?? "unknown"}`
+            ? `Error: ${status.lastError ?? "desconocido"}`
             : syncUrl.trim()
-              ? "Configured but not live yet, open Settings to boot"
-              : "Not configured, staying local";
+              ? "Configurado pero sin conexión aún, abre Configuración para iniciarlo"
+              : "Sin configurar, funcionando en local";
 
   const onJoin = async ({ url, workspace, token }: { url: string; workspace: string; token: string }) => {
     setSyncUrl(url);
@@ -1170,8 +1170,8 @@ function SyncTab() {
   return (
     <div className="space-y-6">
       <Section
-        title="Connect to a workspace"
-        description="Paste an invite from your team's host. Smart-paste: drop the whole invite block into the URL field and all three values fill in."
+        title="Conectar a un espacio de trabajo"
+        description="Pega la invitación de quien aloja el espacio. Pegado inteligente: suelta el bloque completo en el campo URL y los tres valores se rellenan solos."
       >
         <JoinForm
           initialUrl={syncUrl}
@@ -1186,15 +1186,15 @@ function SyncTab() {
       </Section>
 
       <Section
-        title="Host this workspace"
-        description="Run the sync server from this machine so teammates connect to you. Four hosting modes, easiest first."
+        title="Alojar este espacio"
+        description="Ejecuta el servidor de sincronización desde esta máquina para que tus compañeros se conecten a ti. Cuatro modos de alojamiento, del más sencillo al más avanzado."
       >
         <HostingPanel />
       </Section>
 
       <Section
-        title="Quick-save URL"
-        description="If you already know the URL and don't have an invite block yet, just paste it here."
+        title="Guardar URL rápida"
+        description="Si ya conoces la URL y no tienes el bloque de invitación, pégala aquí directamente."
       >
         <div className="space-y-2">
           <input
@@ -1214,10 +1214,10 @@ function SyncTab() {
         </div>
       </Section>
 
-      <Section title="Auto-update" description="The app pulls new versions from whatever update server was baked into this build. Check the WAR_ROOM_UPDATE_URL config or your release.js to change the source.">
+      <Section title="Actualización automática" description="La aplicación descarga nuevas versiones del servidor de actualización configurado en esta build. Consulta WAR_ROOM_UPDATE_URL o release.js para cambiar la fuente.">
         <div className="flex items-center gap-2 text-sm">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-neutral-300">Connected, checks for updates on every launch</span>
+          <span className="text-neutral-300">Conectado, comprueba actualizaciones en cada arranque</span>
         </div>
       </Section>
     </div>
@@ -1227,21 +1227,21 @@ function SyncTab() {
 function AboutTab({ about }: { about: AboutInfo | null }) {
   return (
     <div className="space-y-6">
-      <Section title="Build">
+      <Section title="Versión">
         {about ? (
           <dl className="text-sm grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-            <dt className="text-neutral-500">Name</dt>
+            <dt className="text-neutral-500">Nombre</dt>
             <dd className="text-neutral-200">{about.name}</dd>
-            <dt className="text-neutral-500">Version</dt>
+            <dt className="text-neutral-500">Versión</dt>
             <dd className="text-neutral-200 font-mono">v{about.version}</dd>
-            <dt className="text-neutral-500">Update server</dt>
+            <dt className="text-neutral-500">Servidor de actualización</dt>
             <dd className="text-neutral-300 font-mono text-xs break-all">{about.repo ?? "-"}</dd>
           </dl>
         ) : (
-          <div className="text-xs text-neutral-600">Loading…</div>
+          <div className="text-xs text-neutral-600">Cargando…</div>
         )}
       </Section>
-      <Section title="Credits" description="Open-source AGPL-3.0 release. Open source dependencies listed in package.json.">
+      <Section title="Créditos" description="Publicación de código abierto AGPL-3.0. Dependencias de código abierto listadas en package.json.">
         <div />
       </Section>
     </div>

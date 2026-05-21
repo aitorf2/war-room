@@ -332,7 +332,8 @@ export function ChannelList() {
                     </button>
                     {g.userCreated && (
                       <button
-                        title={`Delete category "${g.label}"`}
+                        title={`Eliminar categoría "${g.label}"`}
+                        aria-label={`Eliminar categoría ${g.label}`}
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={() => deleteGroup(g.label)}
                         className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-red-400 p-0.5"
@@ -375,7 +376,8 @@ export function ChannelList() {
         {creatingGroup && (
           <div className="px-3 mt-2">
             <InlineCreate
-              placeholder="New category"
+              placeholder="Nueva categoría"
+              ariaLabel="Nombre de nueva categoría"
               onSubmit={createGroup}
               onCancel={() => setCreatingGroup(false)}
             />
@@ -428,10 +430,11 @@ export function ChannelList() {
       <div className="px-2 py-2 border-t border-neutral-900 flex items-center gap-1">
         <button
           onClick={() => setCreatingGroup(true)}
+          aria-label="Nueva categoría"
           className="flex-1 flex items-center gap-2 px-2 py-1.5 text-xs text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200 rounded-md transition-colors"
         >
           <FolderPlus className="w-3.5 h-3.5" />
-          New category
+          Nueva categoría
         </button>
       </div>
     </aside>
@@ -440,17 +443,19 @@ export function ChannelList() {
 
 function InlineCreate({
   placeholder,
+  ariaLabel,
   onSubmit,
   onCancel,
 }: {
   placeholder: string;
+  ariaLabel?: string;
   onSubmit: (v: string) => void;
   onCancel: () => void;
 }) {
   const [v, setV] = useState("");
   return (
     <div className="mx-2 my-1 flex items-center gap-1">
-      <Hash className="w-3.5 h-3.5 text-neutral-600 ml-1" />
+      <Hash className="w-3.5 h-3.5 text-neutral-600 ml-1" aria-hidden />
       <input
         autoFocus
         value={v}
@@ -460,6 +465,7 @@ function InlineCreate({
           if (e.key === "Escape") onCancel();
         }}
         placeholder={placeholder}
+        aria-label={ariaLabel ?? placeholder}
         className="flex-1 bg-neutral-900 border border-neutral-800 rounded text-xs px-2 py-1 focus:outline-none focus:border-neutral-700"
       />
       <button onClick={onCancel} className="p-1 text-neutral-600 hover:text-neutral-300">
@@ -474,11 +480,11 @@ type ServerLike = { name: string; is_default: number } | undefined;
 
 function describeServer(s: ServerLike): string {
   if (!s) return "";
-  if (s.name === "The War Room") return "Shared team workspace";
-  if (s.is_default) return `${s.name} · your personal workspace`;
+  if (s.name === "The War Room") return "Espacio de trabajo compartido";
+  if (s.is_default) return `${s.name} · tu espacio personal`;
   const m = s.name.match(/^(.+?)-Brain$/i);
-  if (m) return `${m[1]}'s personal workspace`;
-  return `${s.name} · personal workspace`;
+  if (m) return `espacio personal de ${m[1]}`;
+  return `${s.name} · espacio personal`;
 }
 
 function SortableGroup({ label, children }: { label: string; children: React.ReactNode }) {
@@ -567,9 +573,10 @@ function ChannelRow({
       <button
         onClick={onOpenMenu}
         className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800 rounded p-0.5"
-        title="Channel options (or right-click)"
+        title={`Opciones de ${channel.name}`}
+        aria-label={`Opciones de ${channel.name}`}
       >
-        <MoreVertical className="w-3.5 h-3.5" />
+        <MoreVertical className="w-3.5 h-3.5" aria-hidden />
       </button>
     </div>
   );

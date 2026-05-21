@@ -264,6 +264,105 @@ ipcMain.on("mini:hide", () => {
   }
 });
 
+// ─── Autonomous heartbeat ─────────────────────────────────────────────────
+// Polls every 10 minutes to check if any channel has been idle long enough
+// to warrant an autonomous Claude turn. When the server reports a trigger,
+// fires a POST to /api/chat and drains the streaming response so the turn
+// completes fully. The 2-hour idle threshold is enforced server-side in
+// checkAutonomousTrigger (autonomy_freq_secs on the active phase, default 7200 s).
+
+let _heartbeatTimer = null;
+
+function _httpGet(url) {
+  return new Promise((resolve, reject) => {
+    const req = http.get(url, (res) => {
+      const chunks = [];
+      res.on("data", (chunk) => chunks.push(chunk));
+      res.on("end", () =>
+        resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString() }),
+      );
+    });
+    req.on("error", reject);
+  });
+}
+
+function _httpPost(url, body) {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify(body);
+    const parsed = new URL(url);
+    const req = http.request(
+      {
+        hostname: parsed.hostname,
+        port: parseInt(parsed.port, 10),
+        path: parsed.pathname + parsed.search,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(data),
+        },
+      },
+      (res) => {
+        // Drain the SSE stream so the connection stays open until Claude finishes.
+        // The chat route logs the reply to the DB automatically — we don't need the text.
+        let bytes = 0;
+        res.on("data", (chunk) => {
+          bytes += chunk.length;
+        });
+        res.on("end", () => resolve({ status: res.statusCode, bytes }));
+      },
+    );
+    req.on("error", reject);
+    req.write(data);
+    req.end();
+  });
+}
+
+async function _fireChatTurn(baseUrl, channelId, projectPath, prompt) {
+  console.log(
+    `[heartbeat] autonomous turn channel=${channelId} path=${projectPath}`,
+  );
+  try {
+    const { status, bytes } = await _httpPost(`${baseUrl}/api/chat`, {
+      channelId,
+      projectPath,
+      prompt,
+    });
+    console.log(
+      `[heartbeat] turn done channel=${channelId} status=${status} bytes=${bytes}`,
+    );
+  } catch (e) {
+    console.error(`[heartbeat] turn failed channel=${channelId}:`, e.message);
+  }
+}
+
+async function _runHeartbeat(baseUrl) {
+  try {
+    const { status, body } = await _httpGet(`${baseUrl}/api/autonomous/heartbeat`);
+    if (status !== 200) {
+      console.warn(`[heartbeat] unexpected status ${status}`);
+      return;
+    }
+    const { triggers } = JSON.parse(body);
+    if (!Array.isArray(triggers) || triggers.length === 0) return;
+    console.log(`[heartbeat] ${triggers.length} trigger(s)`);
+    for (const { channelId, projectPath, prompt } of triggers) {
+      // Fire each turn without blocking the heartbeat loop.
+      _fireChatTurn(baseUrl, channelId, projectPath, prompt);
+    }
+  } catch (e) {
+    console.warn("[heartbeat] poll error:", e.message);
+  }
+}
+
+function startAutonomousHeartbeat(baseUrl) {
+  if (_heartbeatTimer) clearInterval(_heartbeatTimer);
+  const POLL_MS = 10 * 60 * 1000; // 10 minutes
+  // Give the Next.js server a 5 s grace period before the first check.
+  setTimeout(() => _runHeartbeat(baseUrl), 5000);
+  _heartbeatTimer = setInterval(() => _runHeartbeat(baseUrl), POLL_MS);
+  console.log("[heartbeat] started — polling every 10 min, idle threshold 2 h");
+}
+
 // ─── Auto-update ────────────────────────────────────────────────────────────
 // Updates download in the background, but instead of silently restarting we
 // surface a popup in the renderer. The user clicks "Restart" → IPC fires
@@ -382,6 +481,7 @@ if (!hasSingleInstanceLock) {
     await createMiniWindow();
 
     if (!isDev) wireAutoUpdater();
+    startAutonomousHeartbeat(targetUrl());
 
     app.on("activate", () => {
       if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
@@ -396,4 +496,5 @@ app.on("window-all-closed", () => {
 app.on("before-quit", () => {
   app.isQuitting = true;
   if (nextProcess && !nextProcess.killed) nextProcess.kill();
+  if (_heartbeatTimer) clearInterval(_heartbeatTimer);
 });

@@ -19,13 +19,13 @@ export default function NotFound() {
         />
         <h1 className="text-3xl font-semibold mb-2">404</h1>
         <p className="text-sm text-neutral-400 leading-relaxed mb-6">
-          Hit a wall. This page doesn&apos;t exist or got moved.
+          Página no encontrada o movida.
         </p>
         <Link
           href="/c/home"
           className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-200 hover:bg-amber-500/30"
         >
-          Back to the dashboard
+          Volver al panel
         </Link>
       </div>
     </div>

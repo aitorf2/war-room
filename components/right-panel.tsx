@@ -94,7 +94,7 @@ export function RightPanel({ channel }: { channel: Channel | null }) {
     return assignments.find((x) => x.member_kind === m.kind && x.member_id === m.id)?.role_id ?? null;
   };
 
-  // Group: each role section gets its members, plus a final "Members"
+  // Group: each role section gets its members, plus a final "Miembros"
   // catch-all for anything unassigned. Roles with zero members are
   // hidden so empty role names don't visually litter the sidebar.
   const grouped: Array<{ key: string; label: string; color: string | null; members: Member[] }> = [];
@@ -108,7 +108,7 @@ export function RightPanel({ channel }: { channel: Channel | null }) {
   if (unassigned.length > 0) {
     grouped.push({
       key: "unassigned",
-      label: roles.length > 0 ? "Members" : `Members - ${unassigned.length}`,
+      label: roles.length > 0 ? "Miembros" : `Miembros - ${unassigned.length}`,
       color: null,
       members: unassigned,
     });
@@ -117,10 +117,10 @@ export function RightPanel({ channel }: { channel: Channel | null }) {
   if (!channel) return null;
   return (
     <aside className="w-60 shrink-0 border-l border-neutral-900 bg-neutral-950 px-4 py-5 overflow-y-auto hidden xl:block">
-      <Section title="Properties">
+      <Section title="Propiedades">
         {channel.projectPath ? (
           <>
-            <Prop icon={<FolderOpen className="w-3.5 h-3.5" />} label="cwd">
+            <Prop icon={<FolderOpen aria-hidden="true" className="w-3.5 h-3.5" />} label="cwd">
               <code
                 className="text-[11px] text-neutral-400 truncate block"
                 title={channel.projectPath}
@@ -128,28 +128,28 @@ export function RightPanel({ channel }: { channel: Channel | null }) {
                 {channel.projectPath}
               </code>
             </Prop>
-            <Prop icon={<FileText className="w-3.5 h-3.5" />} label="brief">
+            <Prop icon={<FileText aria-hidden="true" className="w-3.5 h-3.5" />} label="resumen">
               <span className="text-xs text-neutral-500">brief.md</span>
             </Prop>
-            <Prop icon={<Calendar className="w-3.5 h-3.5" />} label="status">
+            <Prop icon={<Calendar aria-hidden="true" className="w-3.5 h-3.5" />} label="estado">
               <span className="text-xs text-neutral-300">
-                {channel.archived ? "finished" : "active"}
+                {channel.archived ? "finalizado" : "activo"}
               </span>
             </Prop>
           </>
         ) : (
-          <div className="text-xs text-neutral-600">System channel</div>
+          <div className="text-xs text-neutral-600">Canal del sistema</div>
         )}
       </Section>
 
       {configured.length === 0 && (
-        <Section title="Agents" icon={<Bot className="w-3 h-3" />}>
+        <Section title="Agentes" icon={<Bot aria-hidden="true" className="w-3 h-3" />}>
           <button
             onClick={() => window.dispatchEvent(new CustomEvent("war-room:open-settings", { detail: { tab: "agent" } }))}
             className="text-xs text-neutral-500 italic hover:text-neutral-300 text-left flex items-center gap-1.5 w-full"
           >
-            <Bot className="w-3 h-3" />
-            <span>No agents in roster. Click to set up.</span>
+            <Bot aria-hidden="true" className="w-3 h-3" />
+            <span>Sin agentes configurados. Haz clic para configurar.</span>
           </button>
         </Section>
       )}

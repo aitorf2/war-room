@@ -79,9 +79,9 @@ export function WelcomeBanner() {
             className="w-12 h-12 [image-rendering:pixelated] shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-neutral-50 mb-1">Welcome to War Room.</h3>
+            <h3 className="text-lg font-semibold text-neutral-50 mb-1">Bienvenido a War Room.</h3>
             <p className="text-sm text-neutral-300 leading-relaxed mb-3">
-              A shared cockpit for you and your AI agent. The setup wizard takes ~30 seconds.
+              Un puesto de mando compartido para ti y tu agente IA. El asistente de configuración tarda unos 30 segundos.
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -89,7 +89,7 @@ export function WelcomeBanner() {
                 className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-200 hover:bg-amber-500/30"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                Run setup wizard
+                Ejecutar el asistente
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               {needsAgent && (
@@ -98,14 +98,13 @@ export function WelcomeBanner() {
                   className="flex items-center gap-1.5 px-4 py-2 text-sm rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/30"
                 >
                   <Bot className="w-3.5 h-3.5" />
-                  Or jump straight to picking your AI
+                  O ir directamente a elegir tu IA
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
             <div className="mt-3 text-[11px] text-neutral-500">
-              Backend options: Claude Code, OpenAI Codex, Gemini CLI, plus BYOK API for any of
-              those plus xAI Grok and any OpenAI-compatible endpoint (OpenRouter, Groq, Ollama, etc).
+              Opciones disponibles: Claude Code, OpenAI Codex, Gemini CLI, y acceso directo por API para cualquiera de ellos más xAI Grok y cualquier punto de acceso compatible con OpenAI (OpenRouter, Groq, Ollama, etc).
             </div>
           </div>
         </div>
@@ -122,18 +121,18 @@ export function WelcomeBanner() {
     <div className="mb-6 flex items-center gap-3 px-4 py-2.5 rounded-lg border border-neutral-800 bg-neutral-900/40 text-xs text-neutral-400">
       <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
       <span className="flex-1 min-w-0">
-        Setup is reachable anytime from{" "}
+        La configuración está disponible en cualquier momento desde{" "}
         <button
           onClick={openGeneralSettings}
           className="text-neutral-200 hover:text-amber-300 underline underline-offset-2"
         >
-          Settings → General
+          Ajustes → General
         </button>
         .
       </span>
       <button
         onClick={dismiss}
-        title="Dismiss"
+        aria-label="Cerrar"
         className="text-neutral-500 hover:text-neutral-200 p-1 rounded hover:bg-neutral-800"
       >
         <X className="w-3.5 h-3.5" />

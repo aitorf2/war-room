@@ -172,7 +172,7 @@ export async function checkAutonomousTrigger(
     )
     .get(channelId) as { autonomy_freq_secs: number } | undefined;
 
-  const freqSecs = currentPhase?.autonomy_freq_secs ?? 3600; // default: 1 h
+  const freqSecs = currentPhase?.autonomy_freq_secs ?? 7200; // default: 2 h
 
   // Find the most recent message in any session for this projectPath
   const lastMsg = db()

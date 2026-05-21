@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
   const freqSecs =
     typeof body.autonomyFreqSecs === "number" && body.autonomyFreqSecs > 0
       ? Math.round(body.autonomyFreqSecs)
-      : 3600;
+      : 7200;
 
   const now = Date.now();
 

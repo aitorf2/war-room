@@ -175,6 +175,7 @@ function ServerIcon({
         onEdit();
       }}
       title={t.rail.editServer.serverIconTitle(server.name)}
+      aria-label={server.name}
       {...ariaCurrent(active)}
       className="relative group"
     >
@@ -235,19 +236,25 @@ function CreateServerModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-server-title"
+        className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl w-full max-w-md p-6 shadow-2xl"
+      >
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-semibold">{t.rail.createServer.title}</h2>
+            <h2 id="create-server-title" className="text-lg font-semibold">{t.rail.createServer.title}</h2>
             <p className="text-xs text-neutral-500 mt-0.5">
               {t.rail.createServer.subtitle}
             </p>
           </div>
           <button
             onClick={onClose}
+            aria-label={t.settings.close}
             className="text-neutral-500 hover:text-neutral-300 p-1"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden />
           </button>
         </div>
 
@@ -341,16 +348,25 @@ function EditServerModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-server-title"
+        className="bg-[#0d0d0f] border border-neutral-800 rounded-2xl w-full max-w-md p-6 shadow-2xl"
+      >
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-semibold">{t.rail.editServer.title}</h2>
+            <h2 id="edit-server-title" className="text-lg font-semibold">{t.rail.editServer.title}</h2>
             <p className="text-xs text-neutral-500 mt-0.5">
               {t.rail.editServer.subtitle}
             </p>
           </div>
-          <button onClick={onClose} className="text-neutral-500 hover:text-neutral-300 p-1">
-            <X className="w-4 h-4" />
+          <button
+            onClick={onClose}
+            aria-label={t.settings.close}
+            className="text-neutral-500 hover:text-neutral-300 p-1"
+          >
+            <X className="w-4 h-4" aria-hidden />
           </button>
         </div>
 

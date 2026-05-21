@@ -56,7 +56,7 @@ export default function GlobalError({
               margin: "0 0 0.5rem",
             }}
           >
-            App layout crashed.
+            El diseño de la aplicación ha fallado.
           </h1>
           <p
             style={{
@@ -66,9 +66,8 @@ export default function GlobalError({
               margin: "0 0 1rem",
             }}
           >
-            The shell itself threw an error before the dashboard could
-            render. Retry to reload the layout; if it keeps crashing,
-            the error message below is the place to start.
+            El contenedor ha fallado antes de que el panel pudiera mostrarse.
+            Pulsa Reintentar para recargar.
           </p>
           {error.message && (
             <pre
@@ -101,7 +100,7 @@ export default function GlobalError({
               cursor: "pointer",
             }}
           >
-            Retry
+            Reintentar
           </button>
         </div>
       </body>

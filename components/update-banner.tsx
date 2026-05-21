@@ -60,16 +60,16 @@ function DownloadingCard({ percent, version, onDismiss }: { percent: number; ver
     <div className="bg-[#0d0d0f] border border-neutral-800 rounded-xl shadow-2xl p-4 flex gap-3 items-start">
       <CloudDownload className="w-5 h-5 text-sky-400 shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold text-neutral-100">Downloading update</div>
+        <div className="text-sm font-semibold text-neutral-100">Descargando actualización</div>
         <div className="text-xs text-neutral-500 mt-0.5">
-          {version ? `v${version} · ` : ""}War Room will let you know when it&apos;s ready.
+          {version ? `v${version} · ` : ""}War Room te avisará cuando esté lista.
         </div>
         <div className="mt-2 h-1 bg-neutral-900 rounded overflow-hidden">
           <div className="h-full bg-sky-500 transition-[width] duration-300" style={{ width: `${percent}%` }} />
         </div>
         <div className="text-[10px] text-neutral-600 mt-1">{percent}%</div>
       </div>
-      <button onClick={onDismiss} title="Dismiss" className="text-neutral-600 hover:text-neutral-300 p-1">
+      <button onClick={onDismiss} aria-label="Cerrar" className="text-neutral-600 hover:text-neutral-300 p-1">
         <X className="w-3.5 h-3.5" />
       </button>
     </div>
@@ -87,10 +87,10 @@ function ReadyCard({ version, onDismiss }: { version?: string | null; onDismiss:
       <Cloud className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-neutral-100">
-          Update ready{version ? ` · v${version}` : ""}
+          Actualización lista{version ? ` · v${version}` : ""}
         </div>
         <div className="text-xs text-neutral-500 mt-0.5">
-          Restart War Room to apply. Your work is saved locally, no data will be lost.
+          Reinicia War Room para aplicar. Tu trabajo está guardado localmente, no se perderán datos.
         </div>
         <div className="mt-2.5 flex items-center gap-2">
           <button
@@ -99,17 +99,17 @@ function ReadyCard({ version, onDismiss }: { version?: string | null; onDismiss:
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 hover:bg-emerald-500/30 disabled:opacity-40"
           >
             {restarting ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCw className="w-3 h-3" />}
-            {restarting ? "Restarting…" : "Restart now"}
+            {restarting ? "Reiniciando…" : "Reiniciar ahora"}
           </button>
           <button
             onClick={onDismiss}
             className="text-xs text-neutral-400 hover:text-neutral-200 px-2"
           >
-            Later
+            Más tarde
           </button>
         </div>
       </div>
-      <button onClick={onDismiss} title="Dismiss" className="text-neutral-600 hover:text-neutral-300 p-1">
+      <button onClick={onDismiss} aria-label="Cerrar" className="text-neutral-600 hover:text-neutral-300 p-1">
         <X className="w-3.5 h-3.5" />
       </button>
     </div>
@@ -121,10 +121,10 @@ function ErrorCard({ message, onDismiss }: { message: string; onDismiss: () => v
     <div className="bg-[#0d0d0f] border border-red-500/40 rounded-xl shadow-2xl p-4 flex gap-3 items-start">
       <Cloud className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-semibold text-neutral-100">Update failed</div>
+        <div className="text-sm font-semibold text-neutral-100">La actualización ha fallado</div>
         <div className="text-xs text-neutral-500 mt-0.5 break-all">{message}</div>
       </div>
-      <button onClick={onDismiss} title="Dismiss" className="text-neutral-600 hover:text-neutral-300 p-1">
+      <button onClick={onDismiss} aria-label="Cerrar" className="text-neutral-600 hover:text-neutral-300 p-1">
         <X className="w-3.5 h-3.5" />
       </button>
     </div>
