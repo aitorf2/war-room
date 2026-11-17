@@ -1,0 +1,65 @@
+{
+  "proyecto": "war-room",
+  "raiz": ".",
+  "nota": "Generado por ~/.claude/scripts/init_project_checks.py. Una comprobacion con block=true para el despliegue. Las informativas se anotan pero no impiden entregar. Editar a mano es normal: esto solo quita el trabajo de tenerlas delante.",
+  "checks": [
+    {
+      "id": "tipos",
+      "desc": "TypeScript sin errores de tipo",
+      "cmd": "npx tsc --noEmit",
+      "timeout": 600,
+      "block": false,
+      "nota": "Declarada informativa porque hoy no pasa. Comprobacion pendiente: arreglarla y poner block a true en verification.json."
+    },
+    {
+      "id": "lint",
+      "desc": "Lint del proyecto (eslint)",
+      "cmd": "npm run lint",
+      "timeout": 600,
+      "block": false,
+      "nota": "Declarada informativa porque hoy no pasa. Comprobacion pendiente: arreglarla y poner block a true en verification.json."
+    },
+    {
+      "id": "tests",
+      "desc": "Tests (npm run test:migration && npm run test:smoke)",
+      "cmd": "npm test",
+      "timeout": 1800,
+      "block": false,
+      "nota": "Declarada informativa porque hoy no pasa. Comprobacion pendiente: arreglarla y poner block a true en verification.json."
+    },
+    {
+      "id": "proyecto-lint",
+      "desc": "Verificacion que declara el proyecto (lint: eslint)",
+      "cmd": "npm run lint",
+      "timeout": 1800,
+      "origen": "declarada por el proyecto",
+      "block": false,
+      "nota": "Declarada informativa porque hoy no pasa. Comprobacion pendiente: arreglarla y poner block a true en verification.json."
+    },
+    {
+      "id": "proyecto-test",
+      "desc": "Verificacion que declara el proyecto (test: npm run test:migration && npm run test:smoke)",
+      "cmd": "npm run test",
+      "timeout": 1800,
+      "origen": "declarada por el proyecto",
+      "block": false,
+      "nota": "Declarada informativa porque hoy no pasa. Comprobacion pendiente: arreglarla y poner block a true en verification.json."
+    },
+    {
+      "id": "afirmaciones",
+      "desc": "Afirmaciones sin verificador en comentarios (informativa, con linea base)",
+      "cmd": "~/.claude/scripts/audit_claims.py . --todo --baseline .claude/checks-afirmaciones.json",
+      "block": false,
+      "nunca_bloquear": true,
+      "motivo_no_bloqueante": "Informativa por decision, no por resultado. Su precision ronda el 90%: bloquear entregas por comentarios ajenos acaba en que la gente deje de mirarla. Con linea base solo reporta lo escrito despues de medir. Subir a puerta solo si el contador de nuevos lleva semanas en cero.",
+      "timeout": 600
+    },
+    {
+      "id": "seguridad-diff",
+      "desc": "lo cambiado respecto a la rama remota no anade secretos ni patrones peligrosos (seguridad_diff.py; solo mira el diff)",
+      "cmd": "python3 -I ~/clawd/scripts/seguridad_diff.py --repo .",
+      "block": true,
+      "timeout": 120
+    }
+  ]
+}
